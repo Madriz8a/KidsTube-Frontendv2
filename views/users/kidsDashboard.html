@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidsTube - Mi Contenido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/kidsDashboard.css">
+    <link rel="stylesheet" href="../../css/navbar.css">
+    <link rel="stylesheet" href="../../css/dark-mode.css">
+    <script src="../../js/accessControl.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-play-circle-fill me-2"></i>
+                KidsTube
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-profile dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="profile-avatar-small me-2" id="navProfileAvatar">
+                            <!-- Avatar se cargará dinámicamente -->
+                        </div>
+                        <span id="profileName">Mi Perfil</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li>
+                            <button class="dropdown-item" id="exitProfileBtn">
+                                <i class="bi bi-box-arrow-right"></i> Salir
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Encabezado con saludo personalizado -->
+        <div class="welcome-section mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="welcome-title" id="welcomeTitle">¡Hola!</h1>
+                    <p class="welcome-subtitle">¿Qué quieres ver hoy?</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="search-box">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchInput" placeholder="Buscar videos...">
+                            <button class="btn btn-search" type="button" id="searchButton">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de búsqueda (inicialmente oculta) -->
+        <div id="searchResultsSection" class="mb-5" style="display: none;">
+            <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title">
+                    <i class="bi bi-search me-2"></i> Resultados de búsqueda
+                </h2>
+                <button id="closeSearchBtn" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i> Cerrar búsqueda
+                </button>
+            </div>
+            <div class="row g-4" id="searchResults">
+                <!-- Resultados de búsqueda se cargarán aquí -->
+            </div>
+        </div>
+
+        <!-- Contenedor principal para las playlists -->
+        <div id="playlistsContainer">
+            <!-- Las playlists se cargarán dinámicamente aquí -->
+            <div class="text-center py-5" id="loadingIndicator">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3">Cargando tus playlists...</p>
+            </div>
+            
+            <div class="text-center py-5" id="noPlaylistsMessage" style="display: none;">
+                <div class="empty-state">
+                    <i class="bi bi-collection-play"></i>
+                    <h3>No hay playlists disponibles</h3>
+                    <p>Pídele a un adulto que añada contenido a tu perfil</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para reproducción de video -->
+    <div class="modal fade" id="videoPlayerModal" tabindex="-1" aria-labelledby="videoPlayerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoTitle">Título del video</h5>
+                    <div class="ms-auto me-2 d-flex align-items-center">
+                        <div class="form-check form-switch me-3">
+                            <input class="form-check-input" type="checkbox" id="autoplaySwitch" checked>
+                            <label class="form-check-label" for="autoplaySwitch">Reproducción automática</label>
+                        </div>
+                        <span class="badge bg-primary d-none" id="playlistBadge">
+                            Playlist: <span id="currentPlaylistName">Nombre de la playlist</span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="ratio ratio-16x9" id="videoPlayer">
+                        <!-- iframe de YouTube se cargará aquí -->
+                    </div>
+                </div>
+                <div class="modal-footer playlist-controls">
+                    <div class="video-description" id="videoDescription">
+                        <!-- Descripción del video -->
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary me-2" id="prevVideoBtn" disabled>
+                            <i class="bi bi-skip-backward-fill"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary me-2" id="nextVideoBtn" disabled>
+                            <i class="bi bi-skip-forward-fill"></i> Siguiente
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/kidsDashboard.js"></script>
+    <script src="../../js/darkMode.js"></script>
+</body>
+</html>

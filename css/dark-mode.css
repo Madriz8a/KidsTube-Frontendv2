@@ -1,0 +1,1050 @@
+.dark-mode .bg-light,
+.dark-mode .bg-white,
+.dark-mode .bg-f8f9fa {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .stat-icon,
+.dark-mode .stats-icon,
+.dark-mode .icon-wrapper {
+    background-color: var(--darker-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .stat-icon.bg-profiles,
+.dark-mode .stat-icon.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.dark-mode .stat-icon.bg-playlists,
+.dark-mode .stat-icon.bg-success {
+    background-color: #0F9D58 !important;
+}
+
+.dark-mode .stat-icon.bg-videos,
+.dark-mode .stat-icon.bg-danger {
+    background-color: #DB4437 !important;
+}
+
+.dark-mode .badge.bg-light {
+    background-color: var(--darker-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .playlist-videos-count,
+.dark-mode .playlist-profiles-count {
+    background-color: var(--darker-bg) !important;
+    color: var(--text-color) !important;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .container .row,
+.dark-mode .container-fluid .row {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .border,
+.dark-mode .border-top,
+.dark-mode .border-bottom,
+.dark-mode .border-start,
+.dark-mode .border-end {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode h1, 
+.dark-mode h2, 
+.dark-mode h3, 
+.dark-mode h4, 
+.dark-mode h5, 
+.dark-mode h6 {
+    color: var(--text-color) !important;
+}
+
+.dark-mode p,
+.dark-mode .text-muted {
+    color: var(--text-secondary) !important;
+}
+.dark-mode .card,
+.dark-mode .card.shadow,
+.dark-mode .card.shadow-sm,
+.dark-mode .welcome-card,
+.dark-mode .stats-card,
+.dark-mode .quick-access-card,
+.dark-mode .playlist-card,
+.dark-mode .video-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .card:hover,
+.dark-mode .card.shadow:hover,
+.dark-mode .card.shadow-sm:hover,
+.dark-mode .welcome-card:hover,
+.dark-mode .stats-card:hover,
+.dark-mode .quick-access-card:hover,
+.dark-mode .playlist-card:hover,
+.dark-mode .video-card:hover {
+    background-color: var(--card-hover-bg) !important;
+    box-shadow: 0 8px 16px var(--shadow-color) !important;
+}
+
+.dark-mode .card h1, 
+.dark-mode .card h2, 
+.dark-mode .card h3, 
+.dark-mode .card h4, 
+.dark-mode .card h5, 
+.dark-mode .card h6,
+.dark-mode .welcome-card h1,
+.dark-mode .welcome-card h2,
+.dark-mode .welcome-card h3,
+.dark-mode .card-title,
+.dark-mode .stats-info h3,
+.dark-mode .quick-access-card h5,
+.dark-mode .playlist-title,
+.dark-mode .profile-title,
+.dark-mode .video-title {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .card p,
+.dark-mode .card .text-muted,
+.dark-mode .welcome-card p,
+.dark-mode .stats-info h5,
+.dark-mode .quick-access-card p,
+.dark-mode .playlist-meta,
+.dark-mode .video-meta,
+.dark-mode .video-description {
+    color: var(--text-secondary) !important;
+}
+
+:root.dark-mode {
+    --primary-color: #E50914;      /* Rojo Netflix */
+    --primary-hover: #F40612;      /* Rojo Netflix más claro */
+    --secondary-color: #564D4D;    /* Gris oscuro Netflix */
+    --dark-bg: #141414;            /* Fondo principal Netflix */
+    --darker-bg: #0B0B0B;          /* Fondo secundario más oscuro */
+    --card-bg: #181818;            /* Fondo de tarjetas Netflix */
+    --card-hover-bg: #282828;      /* Fondo de tarjetas al hover */
+    --text-color: #FFFFFF;         /* Texto principal */
+    --text-secondary: #B3B3B3;     /* Texto secundario */
+    --border-color: #333333;       /* Color de bordes */
+    --input-bg: #333333;           /* Fondo de inputs */
+    --input-text: #FFFFFF;         /* Texto de inputs */
+    --input-border: #555555;       /* Borde de inputs */
+    --shadow-color: rgba(0, 0, 0, 0.5);  /* Color de sombras */
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+}
+
+.dark-mode .navbar {
+    background: var(--darker-bg) !important;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.dark-mode .navbar-brand,
+.dark-mode .navbar-brand i,
+.dark-mode .nav-link {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .navbar-dark .navbar-nav .nav-link {
+    color: var(--text-secondary);
+}
+
+.dark-mode .navbar-dark .navbar-nav .nav-link:hover,
+.dark-mode .navbar-dark .navbar-nav .nav-link.active {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .navbar.bg-primary {
+    background: var(--darker-bg) !important;
+}
+
+.dark-mode .btn-primary {
+    background: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+}
+
+.dark-mode .btn-primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 15px rgba(229, 9, 20, 0.4);
+}
+
+.dark-mode .btn-secondary {
+    background: var(--secondary-color);
+    box-shadow: 0 4px 10px rgba(86, 77, 77, 0.3);
+}
+
+.dark-mode .btn-secondary:hover {
+    background: #6a5e5e;
+    box-shadow: 0 6px 15px rgba(86, 77, 77, 0.4);
+}
+
+.dark-mode .btn-outline-primary {
+    color: var(--text-color);
+    border-color: var(--primary-color);
+}
+
+.dark-mode .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.dark-mode .btn-light,
+.dark-mode .btn-profile {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: none;
+}
+
+.dark-mode .btn-light:hover,
+.dark-mode .btn-profile:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+}
+
+.dark-mode .card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+}
+
+.dark-mode .card:hover {
+    background-color: var(--card-hover-bg);
+    box-shadow: 0 8px 16px var(--shadow-color) !important;
+}
+
+.dark-mode .card-header {
+    background-color: var(--darker-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-mode .card-header.bg-primary,
+.dark-mode .card-header.bg-light {
+    background-color: var(--darker-bg) !important;
+}
+
+.dark-mode .card-title {
+    color: var(--text-color);
+}
+
+.dark-mode .form-control,
+.dark-mode .input-group-text {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+.dark-mode .form-control:focus {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(229, 9, 20, 0.25);
+}
+
+.dark-mode .form-label {
+    color: var(--text-secondary);
+}
+
+.dark-mode .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.dark-mode .form-text {
+    color: var(--text-secondary);
+}
+
+.dark-mode .dropdown-menu {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.dark-mode .dropdown-item {
+    color: var(--text-color);
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: var(--card-hover-bg);
+    color: var(--text-color);
+}
+
+.dark-mode .dropdown-divider {
+    border-top: 1px solid var(--border-color);
+}
+
+.dark-mode .alert {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.dark-mode .toast {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.dark-mode .toast-header {
+    background-color: var(--darker-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-mode .modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.dark-mode .modal-header {
+    background-color: var(--darker-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-mode .modal-footer {
+    border-top: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+}
+
+.dark-mode .welcome-card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .welcome-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .welcome-card h2 {
+    color: var(--text-color);
+}
+
+.dark-mode .welcome-card p {
+    color: var(--text-secondary);
+}
+
+.dark-mode .stat-item {
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .stat-item:hover {
+    background-color: var(--card-hover-bg);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .stat-info h4 {
+    color: var(--text-secondary);
+}
+
+.dark-mode .stat-info h3 {
+    color: var(--text-color);
+}
+
+.dark-mode .stats-card {
+    background-color: var(--card-bg);
+}
+
+.dark-mode .stats-info h5 {
+    color: var(--text-secondary);
+}
+
+.dark-mode .stats-info h3 {
+    color: var(--text-color);
+}
+
+.dark-mode .quick-access-card {
+    background-color: var(--card-bg);
+}
+
+.dark-mode .quick-access-card:hover {
+    background-color: var(--card-hover-bg);
+}
+
+.dark-mode .quick-access-card h5 {
+    color: var(--text-color);
+}
+
+.dark-mode .quick-access-card p {
+    color: var(--text-secondary);
+}
+
+.dark-mode .welcome-section {
+    background: linear-gradient(135deg, #2D2D2D, #1F1F1F);
+}
+
+.dark-mode .welcome-title {
+    color: var(--text-color);
+}
+
+.dark-mode .welcome-subtitle {
+    color: var(--text-secondary);
+}
+
+.dark-mode .search-box .form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: none;
+}
+
+.dark-mode .search-box .form-control::placeholder,
+.dark-mode #searchInput::placeholder {
+    color: white !important;
+    opacity: 0.9;
+}
+
+.dark-mode .btn-search {
+    background-color: var(--primary-color);
+}
+
+.dark-mode .section-title {
+    color: var(--text-color);
+}
+
+.dark-mode .section-title i {
+    color: var(--primary-color);
+}
+
+.dark-mode .video-card {
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.dark-mode .video-card:hover {
+    background-color: var(--card-hover-bg);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
+}
+
+.dark-mode .video-title {
+    color: var(--text-color);
+}
+
+.dark-mode .video-playlist-name {
+    color: var(--text-secondary);
+}
+
+.dark-mode .empty-state i {
+    color: var(--text-secondary);
+}
+
+.dark-mode .empty-state h3 {
+    color: var(--text-color);
+}
+
+.dark-mode .section-header {
+    border-bottom: 2px solid var(--border-color);
+}
+
+.dark-mode .video-description {
+    color: var(--text-secondary);
+}
+
+.dark-mode .profile-name {
+    color: var(--text-color) !important;
+    font-weight: 500 !important;
+    margin-top: 10px !important;
+}
+
+.dark-mode .profile-card {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.dark-mode .profile-avatar {
+    border: 3px solid var(--primary-color) !important;
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3) !important;
+    background-color: white !important;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.dark-mode .profile-avatar:hover {
+    transform: scale(1.05) !important;
+    border-color: var(--primary-hover) !important;
+    box-shadow: 0 6px 15px rgba(229, 9, 20, 0.4) !important;
+}
+
+.dark-mode #profilesContainer .col {
+    background-color: transparent !important;
+}
+
+.dark-mode .add-profile-btn {
+    background-color: transparent !important;
+    border: 2px dashed var(--primary-color) !important;
+}
+
+.dark-mode .add-profile-btn:hover {
+    background-color: rgba(229, 9, 20, 0.1) !important;
+}
+
+.dark-mode .add-profile-btn i {
+    color: var(--primary-color) !important;
+}
+
+.dark-mode .profiles-title {
+    color: var(--text-color) !important;
+    background-color: transparent !important;
+}
+
+.dark-mode .logo {
+    color: var(--primary-color) !important;
+    text-shadow: 0 0 10px rgba(229, 9, 20, 0.4) !important;
+}
+
+.dark-mode .account-actions .btn {
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .account-actions .btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode #pinModal .modal-content {
+    background: linear-gradient(to bottom, #262626, #1a1a1a);
+}
+
+.dark-mode #pinModal .modal-title {
+    color: var(--primary-color);
+}
+
+.dark-mode #profileNameInModal {
+    color: var(--text-color);
+    background-color: rgba(229, 9, 20, 0.1);
+}
+
+.dark-mode .pin-circle {
+    background-color: #333333;
+    border-color: #444444;
+}
+
+.dark-mode .pin-circle.filled {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.dark-mode .pin-button {
+    background-color: #333333;
+    color: var(--text-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .pin-button:hover {
+    background-color: #444444;
+    color: var(--primary-color);
+}
+
+.dark-mode .pin-button[data-action="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.dark-mode .pin-button[data-action="submit"]:hover {
+    background-color: var(--primary-hover);
+}
+
+.dark-mode .playlist-section {
+    margin-bottom: 2.5rem;
+}
+
+.dark-mode .video-count {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.dark-mode #videoPlayer {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.dark-mode .avatar-option {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .avatar-option:hover, 
+.dark-mode .avatar-option.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(229, 9, 20, 0.1);
+}
+
+.dark-mode #playlistsContainer, 
+.dark-mode #profilesContainer {
+    background-color: transparent !important;
+    border-color: var(--border-color);
+}
+
+.dark-mode .playlist-item, 
+.dark-mode .profile-item {
+    border-color: var(--border-color);
+}
+
+.dark-mode .playlist-item:hover, 
+.dark-mode .profile-item:hover {
+    background-color: var(--card-hover-bg);
+}
+
+.dark-mode .video-preview-wrapper {
+    background-color: var(--darker-bg);
+    border: 1px solid var(--border-color);
+}
+
+.dark-mode .video-url-preview {
+    background-color: var(--input-bg);
+    color: var(--text-secondary);
+}
+
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: #fff;
+    transition: all 0.3s ease;
+    outline: none;
+    padding: 0;
+}
+
+.theme-toggle-btn i {
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-btn .bi-sun-fill {
+    color: #FDB813;
+}
+
+.theme-toggle-btn .bi-moon-fill {
+    color: #FFFFFF;
+}
+
+.theme-toggle-btn:hover {
+    transform: rotate(15deg);
+}
+
+#themeSwitchWrapper {
+}
+
+.dark-mode .playlist-header,
+.dark-mode .category-header,
+.dark-mode .section-header {
+    background-color: transparent !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+
+.dark-mode .btn-edit,
+.dark-mode .btn-edit-playlist,
+.dark-mode .edit-button,
+.dark-mode [class*="btn-edit"] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    transition: all 0.3s ease !important;
+}
+
+.dark-mode .btn-edit:hover,
+.dark-mode .btn-edit-playlist:hover,
+.dark-mode .edit-button:hover,
+.dark-mode [class*="btn-edit"]:hover {
+    background-color: rgba(229, 9, 20, 0.2) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.dark-mode .btn-delete,
+.dark-mode .delete-button,
+.dark-mode .btn-danger,
+.dark-mode [class*="btn-delete"] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .btn-delete:hover,
+.dark-mode .delete-button:hover,
+.dark-mode .btn-danger:hover,
+.dark-mode [class*="btn-delete"]:hover {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+.dark-mode .btn-icon,
+.dark-mode .action-button {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .btn-icon:hover,
+.dark-mode .action-button:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+.dark-mode .video-count,
+.dark-mode .videos-count,
+.dark-mode .badge.bg-danger {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.dark-mode .video-item:hover,
+.dark-mode .playlist-video-item:hover,
+.dark-mode .edit-playlist-video-item:hover,
+.dark-mode .video-list-item:hover,
+.dark-mode tr:hover,
+.dark-mode .table-row:hover,
+.dark-mode tbody tr:hover {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .video-item:hover *,
+.dark-mode .playlist-video-item:hover *,
+.dark-mode .edit-playlist-video-item:hover *,
+.dark-mode .video-list-item:hover *,
+.dark-mode tr:hover *,
+.dark-mode .table-row:hover *,
+.dark-mode tbody tr:hover * {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .video-title:hover,
+.dark-mode .video-details:hover,
+.dark-mode .video-info:hover {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .video-item:hover,
+.dark-mode .playlist-video-item:hover,
+.dark-mode .edit-playlist-video-item:hover,
+.dark-mode tr:hover,
+.dark-mode tbody tr:hover {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .table-striped tbody tr:nth-of-type(odd):hover {
+    background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.dark-mode .video-item.active,
+.dark-mode .playlist-video-item.active,
+.dark-mode .edit-playlist-video-item.active,
+.dark-mode .video-list-item.active,
+.dark-mode tr.active,
+.dark-mode .table-row.active {
+    background-color: rgba(229, 9, 20, 0.2) !important;
+    border-left: 3px solid var(--primary-color) !important;
+}
+
+.dark-mode .edit-card,
+.dark-mode .create-card,
+.dark-mode form.card,
+.dark-mode .edit-form,
+.dark-mode .form-container,
+.dark-mode .edit-playlist-form,
+.dark-mode .edit-profile-form,
+.dark-mode .create-playlist-form,
+.dark-mode .create-profile-form {
+    background-color: var(--card-bg) !important;
+    transition: none !important;
+}
+
+.dark-mode .edit-card:hover,
+.dark-mode .create-card:hover,
+.dark-mode form.card:hover,
+.dark-mode .edit-form:hover,
+.dark-mode .form-container:hover,
+.dark-mode .edit-playlist-form:hover,
+.dark-mode .edit-profile-form:hover,
+.dark-mode .create-playlist-form:hover,
+.dark-mode .create-profile-form:hover {
+    background-color: var(--card-bg) !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    transform: none !important;
+}
+
+.dark-mode .edit-card *:hover,
+.dark-mode .create-card *:hover,
+.dark-mode form.card *:hover,
+.dark-mode .edit-form *:hover,
+.dark-mode .form-container *:hover,
+.dark-mode .edit-playlist-form *:hover,
+.dark-mode .edit-profile-form *:hover,
+.dark-mode .create-playlist-form *:hover,
+.dark-mode .create-profile-form *:hover {
+    background-color: inherit !important;
+}
+
+.dark-mode .edit-card .btn:hover,
+.dark-mode .create-card .btn:hover,
+.dark-mode form.card .btn:hover,
+.dark-mode .edit-form .btn:hover,
+.dark-mode .form-container .btn:hover,
+.dark-mode .edit-playlist-form .btn:hover,
+.dark-mode .edit-profile-form .btn:hover,
+.dark-mode .create-playlist-form .btn:hover,
+.dark-mode .create-profile-form .btn:hover,
+.dark-mode .edit-card .form-control:focus,
+.dark-mode .create-card .form-control:focus,
+.dark-mode form.card .form-control:focus,
+.dark-mode .edit-form .form-control:focus,
+.dark-mode .form-container .form-control:focus,
+.dark-mode .edit-playlist-form .form-control:focus,
+.dark-mode .edit-profile-form .form-control:focus {
+    background-color: initial !important;
+}
+
+.dark-mode .card-header.bg-primary {
+    background: var(--darker-bg) !important;
+    background-image: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .card-title {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .form-control, 
+.dark-mode .input-group-text {
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--input-text) !important;
+}
+
+.dark-mode .form-control:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(229, 9, 20, 0.25) !important;
+}
+
+.dark-mode .form-control:disabled {
+    background-color: rgba(51, 51, 51, 0.7) !important;
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .form-label {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .form-text,
+.dark-mode small,
+.dark-mode .small,
+.dark-mode .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode a {
+    color: #4dabf7;
+}
+
+.dark-mode a:hover {
+    color: #74c0fc;
+}
+
+.dark-mode .modal-content {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .btn-primary {
+    background: var(--primary-color) !important;
+    background-image: none !important;
+    border: none !important;
+    color: white !important;
+}
+
+.dark-mode .btn-primary:hover {
+    background: var(--primary-hover) !important;
+    box-shadow: 0 6px 15px rgba(229, 9, 20, 0.4) !important;
+}
+
+.dark-mode .btn-secondary {
+    background: var(--secondary-color) !important;
+    background-image: none !important;
+    border: none !important;
+}
+
+.dark-mode .btn-secondary:hover {
+    background: #6a5e5e !important;
+    box-shadow: 0 6px 15px rgba(86, 77, 77, 0.4) !important;
+}
+
+.dark-mode .btn-outline-primary {
+    color: var(--text-color) !important;
+    border-color: var(--primary-color) !important;
+    background: transparent !important;
+}
+
+.dark-mode .btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.dark-mode .create-card,
+.dark-mode .edit-card,
+.dark-mode form.card {
+    transition: none !important;
+}
+
+.dark-mode .create-card:hover,
+.dark-mode .edit-card:hover,
+.dark-mode form.card:hover {
+    transform: none !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+}
+
+.dark-mode i.bi,
+.dark-mode .bi::before {
+    color: inherit;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.dark-mode .dropdown-menu {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 4px 15px var(--shadow-color) !important;
+}
+
+.dark-mode .dropdown-item {
+    color: var(--text-color) !important;
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: var(--card-hover-bg) !important;
+}
+
+.dark-mode .dropdown-divider {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode button[id="cancelBtn"],
+.dark-mode a[href="dashboard.html"].btn-secondary,
+.dark-mode a.btn-secondary:has(i.bi-x-circle) {
+    color: #fff !important;
+}
+
+.dark-mode a.btn-primary[href*="crear"],
+.dark-mode button.btn-success[id*="crear"],
+.dark-mode a.btn.btn-success {
+    background: #0F9D58 !important;
+    color: white !important;
+}
+
+.dark-mode .btn i.bi {
+    color: inherit;
+}
+
+.dark-mode .card i.bi,
+.dark-mode .card .bi::before,
+.dark-mode .playlist-thumbnail i,
+.dark-mode .stat-icon i {
+    color: inherit !important;
+}
+
+.dark-mode .btn i.bi,
+.dark-mode .btn .bi::before {
+    color: inherit !important;
+}
+
+.dark-mode a.btn-success i.bi-plus-circle,
+.dark-mode button.btn-success i.bi-plus-circle {
+    color: white !important;
+}
+
+.dark-mode .playlist-thumbnail i.bi-collection-play {
+    color: #0d6efd !important;
+}
+
+.dark-mode input[type="text"],
+.dark-mode input[type="email"],
+.dark-mode input[type="password"],
+.dark-mode input[type="date"],
+.dark-mode input[type="tel"],
+.dark-mode input[type="number"],
+.dark-mode input[type="url"],
+.dark-mode input[type="search"],
+.dark-mode textarea,
+.dark-mode select {
+    color: var(--input-text) !important;
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder,
+.dark-mode select::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
+}
+
+.dark-mode input:disabled,
+.dark-mode textarea:disabled,
+.dark-mode select:disabled {
+    background-color: rgba(51, 51, 51, 0.7) !important;
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus,
+.dark-mode select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(229, 9, 20, 0.25) !important;
+    background-color: var(--input-bg) !important;
+    color: var(--input-text) !important;
+}
+
+.dark-mode .avatar-preview,
+.dark-mode .avatar-option.selected {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25) !important;
+}
+
+.dark-mode .avatar-option:hover {
+    border-color: var(--primary-color) !important;
+}
+
+.dark-mode .profile-avatar,
+.dark-mode .avatar-container img,
+.dark-mode .avatar-preview img {
+    border-color: var(--primary-color) !important;
+}

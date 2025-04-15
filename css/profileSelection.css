@@ -1,0 +1,425 @@
+/* Estilos para la página de selección de perfiles */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-container {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0d6efd;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profiles-title {
+    text-align: center;
+    color: #495057;
+    margin-bottom: 30px;
+}
+
+.profile-card {
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.profile-card:hover {
+    transform: scale(1.05);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+}
+
+.profile-name {
+    font-weight: 500;
+    color: #495057;
+    margin-top: 10px;
+}
+
+.admin-profile .profile-avatar {
+    background-color: #e9ecef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-profile .bi-person-gear {
+    font-size: 3rem;
+    color: #6c757d;
+}
+
+.add-profile-btn {
+    border: 2px dashed #ced4da;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px;
+    transition: all 0.3s ease;
+}
+
+.add-profile-btn:hover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.add-profile-btn i {
+    font-size: 2.5rem;
+    color: #6c757d;
+}
+
+.account-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.account-actions .btn {
+    margin: 0 10px;
+}
+
+/* PIN Modal Styles */
+.pin-circle {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.pin-circle.filled {
+    background-color: #0d6efd;
+}
+
+.pin-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pin-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    background: white;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+}
+
+.pin-button:hover {
+    background-color: #f8f9fa;
+    border-color: #0d6efd;
+    transform: scale(1.05);
+}
+
+/* Estilos para la versión oscura (para implementar más tarde) */
+body.dark-mode {
+    background-color: #121212;
+    color: #f8f9fa;
+}
+
+body.dark-mode .profiles-title {
+    color: #f8f9fa;
+}
+
+body.dark-mode .profile-name {
+    color: #f8f9fa;
+}
+
+body.dark-mode .logo {
+    color: #4dabf7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .pin-button {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Estilos mejorados para el modal de PIN */
+
+/* Estilo general del modal */
+#pinModal .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+}
+
+#pinModal .modal-header {
+    border-bottom: none;
+    padding: 25px 25px 10px;
+    background-color: transparent;
+}
+
+#pinModal .modal-title {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #0d6efd;
+    text-align: center;
+    width: 100%;
+}
+
+#pinModal .btn-close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+#pinModal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+#pinModal .modal-body {
+    padding: 20px 30px 35px;
+}
+
+/* Estilo del nombre del perfil */
+#profileNameInModal {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 20px;
+    padding: 8px 15px;
+    background-color: rgba(13, 110, 253, 0.08);
+    border-radius: 30px;
+    display: inline-block;
+}
+
+/* Estilo para los círculos del PIN */
+.pin-circles {
+    margin: 20px auto 25px;
+}
+
+.pin-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: inline-block;
+    margin: 0 8px;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+}
+
+.pin-circle.filled {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+    animation: pulsePin 0.3s ease;
+}
+
+@keyframes pulsePin {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.1); }
+}
+
+/* Estilo para el teclado numérico */
+.pin-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px auto;
+    max-width: 300px;
+}
+
+.pin-button {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    font-size: 1.7rem;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    background: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 
+                inset 0 -3px 0 rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    color: #495057;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.pin-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 50%;
+}
+
+.pin-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.15), 
+                inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+.pin-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.pin-button:active::after {
+    opacity: 1;
+}
+
+/* Estilos especiales para botones de acción */
+.pin-button[data-action="clear"] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.pin-button[data-action="submit"] {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.pin-button[data-action="submit"]:hover {
+    background-color: #0b5ed7;
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+}
+
+/* Estilo para el mensaje de error */
+#pinError {
+    font-size: 0.95rem;
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+    padding: 10px 15px;
+    border-radius: 30px;
+    display: inline-block;
+    animation: shakeError 0.4s ease-in-out;
+}
+
+@keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* Adaptación para modo oscuro */
+body.dark-mode #pinModal .modal-content {
+    background: linear-gradient(to bottom, #2c2c2c, #212121);
+}
+
+body.dark-mode #pinModal .modal-title {
+    color: #4dabf7;
+}
+
+body.dark-mode #profileNameInModal {
+    color: #e9ecef;
+    background-color: rgba(77, 171, 247, 0.15);
+}
+
+body.dark-mode .pin-circle {
+    background-color: #343a40;
+    border-color: #495057;
+}
+
+body.dark-mode .pin-circle.filled {
+    background-color: #4dabf7;
+    border-color: #4dabf7;
+    box-shadow: 0 0 10px rgba(77, 171, 247, 0.5);
+}
+
+body.dark-mode .pin-button {
+    background-color: #343a40;
+    color: #e9ecef;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .pin-button:hover {
+    background-color: #495057;
+    color: #4dabf7;
+}
+
+body.dark-mode .pin-button[data-action="clear"] {
+    background-color: #343a40;
+    color: #adb5bd;
+}
+
+body.dark-mode .pin-button[data-action="submit"] {
+    background-color: #4dabf7;
+    color: white;
+}
+
+body.dark-mode .pin-button[data-action="submit"]:hover {
+    background-color: #3b99e0;
+}
+
+/* Adaptaciones responsive */
+@media (max-width: 576px) {
+    .pin-button {
+        width: 65px;
+        height: 65px;
+        font-size: 1.5rem;
+    }
+    
+    .pin-pad {
+        gap: 10px;
+        max-width: 250px;
+    }
+    
+    #pinModal .modal-title {
+        font-size: 1.4rem;
+    }
+    
+    #profileNameInModal {
+        font-size: 1.1rem;
+    }
+}

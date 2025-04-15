@@ -1,0 +1,170 @@
+/* Estilos para las páginas de playlists */
+
+.playlist-icon {
+    font-size: 5rem;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.playlist-thumbnail {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f1f3f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.playlist-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.playlist-thumbnail i {
+    font-size: 3rem;
+    color: #0d6efd;
+}
+
+#profilesContainer,
+#videosContainer {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.profile-item,
+.video-item {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.profile-item:last-child,
+.video-item:last-child {
+    border-bottom: none;
+}
+
+.profile-item:hover,
+.video-item:hover {
+    background-color: #f8f9fa;
+}
+
+.profile-item .form-check-label,
+.video-item .form-check-label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+    margin-left: 7px;
+    border: 2px solid #e9ecef;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilo para hacer foco en un elemento seleccionado */
+.form-check-input:checked + .form-check-label {
+    color: #0d6efd;
+}
+
+/* Estilo para los videos de la playlist */
+.video-card {
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.video-thumbnail {
+    height: 180px;
+    background-color: #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-thumbnail .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-thumbnail:hover .play-icon {
+    opacity: 1;
+}
+
+.video-thumbnail .play-icon i {
+    font-size: 2rem;
+    color: #dc3545;
+}
+
+.video-info {
+    padding: 15px;
+}
+
+.video-info h5 {
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.video-info .text-muted {
+    font-size: 0.85rem;
+}
+
+.video-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* Responsividad */
+@media (max-width: 576px) {
+    .video-thumbnail {
+        height: 140px;
+    }
+    
+    .video-info h5 {
+        font-size: 1rem;
+    }
+}

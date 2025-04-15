@@ -1,0 +1,120 @@
+.video-preview-wrapper {
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.video-form-section {
+    margin-bottom: 30px;
+}
+
+.video-url-preview {
+    font-size: 0.9rem;
+    word-break: break-all;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+/* Estilos para el thumbnail de vista previa */
+.thumbnail-preview {
+    width: 100%;
+    max-width: 320px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.thumbnail-preview:hover {
+    transform: scale(1.02);
+}
+
+/* Badge de la playlist */
+#playlistNameBadge {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+/* Estilos para opciones de video */
+.video-option {
+    cursor: pointer;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.video-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: #adb5bd;
+}
+
+.video-option.selected {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.video-option .card-body {
+    padding: 15px;
+}
+
+.video-option img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.video-option h5 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.video-option .text-muted {
+    font-size: 0.85rem;
+}
+
+/* Icono de play para los videos */
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.play-overlay i {
+    font-size: 3rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.video-option:hover .play-overlay {
+    opacity: 1;
+}
+
+/* Responsividad */
+@media (max-width: 576px) {
+    .video-option img {
+        height: 120px;
+    }
+    
+    .thumbnail-preview {
+        height: 150px;
+    }
+}
