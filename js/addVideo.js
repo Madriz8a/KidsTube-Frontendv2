@@ -11,6 +11,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewBtn = document.getElementById('previewBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     
+    // Referencias para búsqueda de YouTube
+    const searchQuery = document.getElementById('searchQuery');
+    const searchYoutubeBtn = document.getElementById('searchYoutubeBtn');
+    const searchResults = document.getElementById('searchResults');
+    const searchLoadingIndicator = document.getElementById('searchLoadingIndicator');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const selectedVideoForm = document.getElementById('selectedVideoForm');
+    const selectedVideoPreview = document.getElementById('selectedVideoPreview');
+    const selectedVideoName = document.getElementById('selectedVideoName');
+    const selectedVideoDescription = document.getElementById('selectedVideoDescription');
+    const selectedVideoUrl = document.getElementById('selectedVideoUrl');
+    const cancelSelectedBtn = document.getElementById('cancelSelectedBtn');
+    
     // Referencias para el nombre del usuario en la navbar
     const userDisplayName = document.getElementById('userDisplayName');
     
@@ -20,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     init();
     
     function init() {
-
         displayUserName();
         
         // Obtener el ID de la playlist de la URL
@@ -100,6 +112,28 @@ document.addEventListener('DOMContentLoaded', function() {
         youtubeUrlInput.addEventListener('input', function() {
             // Ocultar la vista previa cuando se está editando la URL
             videoPreviewContainer.style.display = 'none';
+        });
+        
+        // Event listener para búsqueda en YouTube
+        searchYoutubeBtn.addEventListener('click', handleYoutubeSearch);
+        
+        // Event listener para presionar Enter en el campo de búsqueda
+        searchQuery.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleYoutubeSearch();
+            }
+        });
+        
+        // Event listener para cancelar la selección de video
+        cancelSelectedBtn.addEventListener('click', function() {
+            selectedVideoForm.style.display = 'none';
+        });
+        
+        // Event listener para enviar el formulario de video seleccionado
+        selectedVideoForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleSelectedVideoSubmit();
         });
     }
     
@@ -303,6 +337,243 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         return await response.json();
+    }
+    
+    /**
+     * Maneja la búsqueda de videos en YouTube
+     */
+    async function handleYoutubeSearch() {
+        const query = searchQuery.value.trim();
+        
+        if (!query) {
+            window.Notifications.showFieldError(searchQuery, 'validation_required');
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        searchLoadingIndicator.style.display = 'block';
+        searchResults.style.display = 'none';
+        noResultsMessage.style.display = 'none';
+        selectedVideoForm.style.display = 'none';
+        
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No se ha iniciado sesión');
+            }
+            
+            // Realizar la búsqueda usando la API de YouTube integrada en el backend
+            const response = await fetch(`http://localhost:3000/api/youtube/search?q=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al realizar la búsqueda en YouTube');
+            }
+            
+            const videos = await response.json();
+            
+            // Ocultar indicador de carga
+            searchLoadingIndicator.style.display = 'none';
+            
+            // Mostrar resultados o mensaje de no resultados
+            if (videos && videos.length > 0) {
+                displaySearchResults(videos);
+                searchResults.style.display = 'flex';
+            } else {
+                noResultsMessage.style.display = 'block';
+            }
+            
+        } catch (error) {
+            console.error('Error en la búsqueda:', error);
+            
+            // Ocultar indicador de carga
+            searchLoadingIndicator.style.display = 'none';
+            
+            // Mostrar mensaje de error
+            window.Notifications.showError('search_error', 'Error al buscar videos en YouTube');
+        }
+    }
+    
+    /**
+     * Muestra los resultados de la búsqueda
+     * @param {Array} videos - Lista de videos encontrados
+     */
+    function displaySearchResults(videos) {
+        // Limpiar resultados anteriores
+        searchResults.innerHTML = '';
+        
+        // Mostrar cada video encontrado
+        videos.forEach(video => {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'col-md-6 mb-3';
+            videoCard.innerHTML = `
+                <div class="card h-100 youtube-result-card" data-video-id="${video.id}" data-video-url="${video.youtubeUrl}" data-video-title="${video.title}" data-video-description="${video.description || ''}">
+                    <div class="card-img-top youtube-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="img-fluid">
+                        <div class="play-overlay">
+                            <i class="bi bi-play-circle-fill"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">${video.title}</h5>
+                        <p class="card-text text-muted">${video.channelTitle}</p>
+                        <p class="card-text small description-truncate">${video.description || 'Sin descripción'}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-primary w-100 select-video-btn">
+                            <i class="bi bi-plus-circle"></i> Seleccionar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Añadir evento para seleccionar el video
+            const selectBtn = videoCard.querySelector('.select-video-btn');
+            selectBtn.addEventListener('click', function() {
+                const card = this.closest('.youtube-result-card');
+                selectVideo(card);
+            });
+            
+            // Añadir evento para previsualizar el video
+            const thumbnailContainer = videoCard.querySelector('.youtube-thumbnail');
+            thumbnailContainer.addEventListener('click', function() {
+                const card = this.closest('.youtube-result-card');
+                previewYoutubeVideo(card.getAttribute('data-video-id'));
+            });
+            
+            searchResults.appendChild(videoCard);
+        });
+    }
+    
+    /**
+     * Previsualiza un video de YouTube en una ventana modal
+     * @param {string} videoId - ID del video a previsualizar
+     */
+    function previewYoutubeVideo(videoId) {
+        // Crear un modal dinámico para la vista previa
+        const previewModal = document.createElement('div');
+        previewModal.className = 'modal fade';
+        previewModal.id = 'youtubePreviewModal';
+        previewModal.setAttribute('tabindex', '-1');
+        previewModal.setAttribute('aria-hidden', 'true');
+        
+        previewModal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Vista previa del video</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="ratio ratio-16x9">
+                            <iframe 
+                                src="https://www.youtube.com/embed/${videoId}" 
+                                title="YouTube video player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Añadir el modal al DOM
+        document.body.appendChild(previewModal);
+        
+        // Mostrar el modal
+        const bsModal = new bootstrap.Modal(previewModal);
+        bsModal.show();
+        
+        // Eliminar el modal del DOM cuando se cierre
+        previewModal.addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(previewModal);
+        });
+    }
+    
+    /**
+     * Selecciona un video de los resultados de búsqueda
+     * @param {HTMLElement} card - Tarjeta del video seleccionado
+     */
+    function selectVideo(card) {
+        const videoId = card.getAttribute('data-video-id');
+        const videoUrl = card.getAttribute('data-video-url');
+        const videoTitle = card.getAttribute('data-video-title');
+        const videoDescription = card.getAttribute('data-video-description') || '';
+        
+        // Rellenar el formulario de video seleccionado
+        selectedVideoName.value = videoTitle;
+        selectedVideoDescription.value = videoDescription;
+        selectedVideoUrl.value = videoUrl;
+        
+        // Mostrar la vista previa del video seleccionado
+        selectedVideoPreview.innerHTML = `
+            <div class="selected-video-card">
+                <div class="ratio ratio-16x9 mb-3">
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        `;
+        
+        // Mostrar el formulario de video seleccionado
+        selectedVideoForm.style.display = 'block';
+        
+        // Desplazarse hasta el formulario
+        selectedVideoForm.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    /**
+     * Maneja el envío del formulario de video seleccionado
+     */
+    async function handleSelectedVideoSubmit() {
+        // Validar el formulario
+        if (selectedVideoName.value.trim() === '') {
+            window.Notifications.showFieldError(selectedVideoName, 'validation_required');
+            return;
+        }
+        
+        // Activar estado de carga
+        window.Notifications.toggleFormLoading(selectedVideoForm, true, 'Añadiendo video...');
+        
+        // Obtener los valores del formulario
+        const videoName = selectedVideoName.value.trim();
+        const youtubeUrl = selectedVideoUrl.value.trim();
+        const description = selectedVideoDescription.value.trim();
+        const playlistId = playlistIdInput.value;
+        
+        try {
+            // Crear el video
+            const videoData = await addVideoToPlaylist(videoName, youtubeUrl, description, playlistId);
+            
+            if (videoData && videoData._id) {
+                // Mostrar mensaje de éxito
+                window.Notifications.showSuccess('video_add_success');
+                
+                // Redireccionar a la página de edición de playlist después de un breve retraso
+                setTimeout(() => {
+                    window.location.href = `editPlaylist.html?id=${playlistId}`;
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            
+            // Desactivar estado de carga
+            window.Notifications.toggleFormLoading(selectedVideoForm, false);
+            
+            // Mostrar mensaje de error
+            window.Notifications.showError('video_create_failed');
+        }
     }
     
     /**
