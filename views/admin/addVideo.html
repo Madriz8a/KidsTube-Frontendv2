@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../../css/video.css">
     <link rel="stylesheet" href="../../css/navbar.css">
     <link rel="stylesheet" href="../../css/dark-mode.css">
+    <link rel="stylesheet" href="../../css/youtube-search.css">
     <script src="../../js/accessControl.js"></script>
     
 </head>
@@ -56,51 +57,138 @@
                         <span class="badge bg-light text-primary" id="playlistNameBadge">Playlist</span>
                     </div>
                     <div class="card-body">
-                        <form id="addVideoForm">
-                            <input type="hidden" id="playlistId">
-                            
-                            <div class="mb-3">
-                                <label for="videoName" class="form-label">Nombre del video</label>
-                                <input type="text" class="form-control" id="videoName" placeholder="Título del video" required>
+                        <!-- Pestañas para seleccionar método -->
+                        <ul class="nav nav-tabs mb-4" id="videoAddMethods" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-content" type="button" role="tab" aria-controls="manual-content" aria-selected="true">
+                                    <i class="bi bi-input-cursor-text"></i> URL Manual
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search-content" type="button" role="tab" aria-controls="search-content" aria-selected="false">
+                                    <i class="bi bi-search"></i> Buscar en YouTube
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <!-- Contenido de las pestañas -->
+                        <div class="tab-content" id="videoAddMethodsContent">
+                            <!-- Pestaña de añadir URL manual -->
+                            <div class="tab-pane fade show active" id="manual-content" role="tabpanel" aria-labelledby="manual-tab">
+                                <form id="addVideoForm">
+                                    <input type="hidden" id="playlistId">
+                                    
+                                    <div class="mb-3">
+                                        <label for="videoName" class="form-label">Nombre del video</label>
+                                        <input type="text" class="form-control" id="videoName" placeholder="Título del video" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="youtubeUrl" class="form-label">URL de YouTube</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-youtube"></i></span>
+                                            <input type="url" class="form-control" id="youtubeUrl" 
+                                                placeholder="https://www.youtube.com/watch?v=..." required>
+                                        </div>
+                                        <div class="form-text">Pega la URL completa del video de YouTube</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="videoDescription" class="form-label">Descripción</label>
+                                        <textarea class="form-control" id="videoDescription" rows="3" 
+                                                placeholder="Breve descripción del video..."></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4" id="videoPreviewContainer" style="display: none;">
+                                        <label class="form-label">Vista previa</label>
+                                        <div class="video-preview-wrapper">
+                                            <div id="videoPreview" class="ratio ratio-16x9">
+                                                <!-- El iframe se insertará aquí -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="button" id="cancelBtn" class="btn btn-secondary me-md-2">
+                                            <i class="bi bi-x-circle"></i> Cancelar
+                                        </button>
+                                        <button type="button" id="previewBtn" class="btn btn-info me-md-2">
+                                            <i class="bi bi-eye"></i> Vista previa
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Añadir Video
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="youtubeUrl" class="form-label">URL de YouTube</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-youtube"></i></span>
-                                    <input type="url" class="form-control" id="youtubeUrl" 
-                                           placeholder="https://www.youtube.com/watch?v=..." required>
-                                </div>
-                                <div class="form-text">Pega la URL completa del video de YouTube</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="videoDescription" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="videoDescription" rows="3" 
-                                          placeholder="Breve descripción del video..."></textarea>
-                            </div>
-                            
-                            <div class="mb-4" id="videoPreviewContainer" style="display: none;">
-                                <label class="form-label">Vista previa</label>
-                                <div class="video-preview-wrapper">
-                                    <div id="videoPreview" class="ratio ratio-16x9">
-                                        <!-- El iframe se insertará aquí -->
+                            <!-- Pestaña de búsqueda en YouTube -->
+                            <div class="tab-pane fade" id="search-content" role="tabpanel" aria-labelledby="search-tab">
+                                <div class="youtube-search-container">
+                                    <div class="mb-3">
+                                        <label for="searchQuery" class="form-label">Buscar en YouTube</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchQuery" 
+                                                placeholder="Término de búsqueda...">
+                                            <button class="btn btn-primary" type="button" id="searchYoutubeBtn">
+                                                <i class="bi bi-search"></i> Buscar
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Busca videos infantiles apropiados para niños</div>
+                                    </div>
+                                    
+                                    <!-- Indicador de carga para la búsqueda -->
+                                    <div id="searchLoadingIndicator" class="text-center py-4" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Buscando...</span>
+                                        </div>
+                                        <p class="mt-2">Buscando videos en YouTube...</p>
+                                    </div>
+                                    
+                                    <!-- Contenedor de resultados de búsqueda -->
+                                    <div id="searchResults" class="row g-3 mb-4" style="display: none;">
+                                        <!-- Los resultados de la búsqueda se insertarán aquí -->
+                                    </div>
+                                    
+                                    <!-- Mensaje cuando no hay resultados -->
+                                    <div id="noResultsMessage" class="text-center py-4" style="display: none;">
+                                        <i class="bi bi-search" style="font-size: 2rem;"></i>
+                                        <p class="mt-2">No se encontraron resultados. Intenta con otros términos.</p>
                                     </div>
                                 </div>
+                                
+                                <!-- Formulario oculto para añadir el video seleccionado -->
+                                <form id="selectedVideoForm" style="display: none;">
+                                    <hr class="my-4">
+                                    <h5 class="mb-3">Video seleccionado</h5>
+                                    
+                                    <div id="selectedVideoPreview" class="mb-3">
+                                        <!-- La vista previa del video seleccionado se insertará aquí -->
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="selectedVideoName" class="form-label">Nombre del video</label>
+                                        <input type="text" class="form-control" id="selectedVideoName" required>
+                                    </div>
+                                    
+                                    <input type="hidden" id="selectedVideoUrl">
+                                    
+                                    <div class="mb-3">
+                                        <label for="selectedVideoDescription" class="form-label">Descripción</label>
+                                        <textarea class="form-control" id="selectedVideoDescription" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="button" id="cancelSelectedBtn" class="btn btn-secondary me-md-2">
+                                            <i class="bi bi-x-circle"></i> Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Añadir Video
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
-                            
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="button" id="cancelBtn" class="btn btn-secondary me-md-2">
-                                    <i class="bi bi-x-circle"></i> Cancelar
-                                </button>
-                                <button type="button" id="previewBtn" class="btn btn-info me-md-2">
-                                    <i class="bi bi-eye"></i> Vista previa
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-plus-circle"></i> Añadir Video
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
