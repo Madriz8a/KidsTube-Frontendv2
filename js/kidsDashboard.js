@@ -439,66 +439,86 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-      // Realizar la búsqueda
-      const response = await fetch(
-        `http://localhost:3000/api/restricted/videos?search=${encodeURIComponent(
-          searchTerm
-        )}`,
-        {
-          method: "GET",
+        // MODIFICADO: Usar GraphQL en lugar de REST para la búsqueda de videos
+        const graphqlQuery = `
+          query SearchVideos($searchTerm: String!) {
+            searchVideos(searchTerm: $searchTerm) {
+              _id
+              name
+              youtubeUrl
+              description
+              playlistId
+              adminId
+            }
+          }
+        `;
+        
+        // Realizar la consulta GraphQL
+        const response = await fetch('http://localhost:4000/graphql', {
+          method: 'POST',
           headers: {
-            "x-restricted-pin": currentProfile.pin,
-            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-restricted-pin': currentProfile.pin,
+            'Authorization': `Bearer ${token}`
           },
+          body: JSON.stringify({
+            query: graphqlQuery,
+            variables: {
+              searchTerm: searchTerm
+            }
+          })
+        });
+
+        const result = await response.json();
+        
+        // Verificar errores en la respuesta GraphQL
+        if (result.errors) {
+          throw new Error(result.errors[0].message || 'Error en la búsqueda GraphQL');
         }
-      );
+        
+        // Obtener los videos de la respuesta
+        const videos = result.data.searchVideos;
+        searchResultVideos = videos;
 
-      if (!response.ok) {
-        throw new Error("Error al buscar videos");
-      }
+        // Mostrar resultados
+        searchResults.innerHTML = "";
 
-      const videos = await response.json();
-      searchResultVideos = videos;
-
-      // Mostrar resultados
-      searchResults.innerHTML = "";
-
-      if (videos.length === 0) {
-        searchResults.innerHTML = `
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <i class="bi bi-search"></i>
-                            <h3>No se encontraron resultados</h3>
-                            <p>Intenta con otra búsqueda</p>
-                        </div>
-                    </div>
-                `;
-        return;
-      }
-
-      // Renderizar cada video encontrado
-      videos.forEach((video, index) => {
-        // Determinar a qué playlist pertenece el video
-        const playlistId = video.playlistId;
-
-        const videoCard = createVideoCard(video, playlistId);
-        videoCard.classList.add("search-result");
-        searchResults.appendChild(videoCard);
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      searchResults.innerHTML = `
+        if (videos.length === 0) {
+            searchResults.innerHTML = `
                 <div class="col-12">
                     <div class="empty-state">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <h3>Error al buscar</h3>
-                        <p>Ocurrió un problema al realizar la búsqueda</p>
-                        <button class="btn btn-primary mt-3" onclick="handleSearch()">
-                            <i class="bi bi-arrow-clockwise me-2"></i>Intentar de nuevo
-                        </button>
+                        <i class="bi bi-search"></i>
+                        <h3>No se encontraron resultados</h3>
+                        <p>Intenta con otra búsqueda</p>
                     </div>
                 </div>
             `;
+            return;
+        }
+
+        // Renderizar cada video encontrado
+        videos.forEach((video, index) => {
+            // Determinar a qué playlist pertenece el video
+            const playlistId = video.playlistId;
+
+            const videoCard = createVideoCard(video, playlistId);
+            videoCard.classList.add("search-result");
+            searchResults.appendChild(videoCard);
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        searchResults.innerHTML = `
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h3>Error al buscar</h3>
+                    <p>Ocurrió un problema al realizar la búsqueda</p>
+                    <button class="btn btn-primary mt-3" onclick="handleSearch()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Intentar de nuevo
+                    </button>
+                </div>
+            </div>
+        `;
     }
   }
 
