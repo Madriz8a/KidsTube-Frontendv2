@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const profilesContainer = document.getElementById("profilesContainer");
   const switchAccountBtn = document.getElementById("switchAccountBtn");
   const adminNavBtn = document.getElementById("adminNavBtn");
+  const searchProfileInput = document.getElementById("searchProfileInput");
+  const searchProfileBtn = document.getElementById("searchProfileBtn");
 
   const pinModal = document.getElementById("pinModal");
   const profileNameInModal = document.getElementById("profileNameInModal");
@@ -36,18 +38,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!token) {
       // Mostrar mensaje de error en lugar de redireccionar inmediatamente
       profilesContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-danger text-center">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Sesión expirada o no iniciada
-                        <div class="mt-3">
-                            <a href="../shared/login.html" class="btn btn-primary">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `;
+        <div class="col-12">
+          <div class="alert alert-danger text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Sesión expirada o no iniciada
+            <div class="mt-3">
+              <a href="../shared/login.html" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
 
       // Ocultar botones de navegación
       if (switchAccountBtn) switchAccountBtn.style.display = "none";
@@ -56,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Cargar perfiles
+    // Cargar perfiles usando GraphQL
     loadProfiles();
 
     // Configurar event listeners
@@ -105,6 +107,20 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
+    // Evento para la búsqueda de perfiles
+    if (searchProfileBtn) {
+      searchProfileBtn.addEventListener("click", handleProfileSearch);
+    }
+
+    if (searchProfileInput) {
+      searchProfileInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleProfileSearch();
+        }
+      });
+    }
+
     // Eventos para el teclado numérico del PIN
     pinButtons.forEach((button) => {
       button.addEventListener("click", function () {
@@ -147,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Carga los perfiles disponibles
+   * Carga los perfiles disponibles usando GraphQL
    */
   async function loadProfiles() {
     try {
@@ -155,29 +171,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Mostrar indicador de carga
       profilesContainer.innerHTML = `
-                <div class="col-12 text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando perfiles...</span>
-                    </div>
-                    <p class="mt-3">Cargando perfiles...</p>
-                </div>
-            `;
+        <div class="col-12 text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando perfiles...</span>
+          </div>
+          <p class="mt-3">Cargando perfiles...</p>
+        </div>
+      `;
 
-      const response = await fetch(
-        "http://localhost:3000/api/public/profiles",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      // Usar GraphQL para obtener perfiles
+      const graphqlQuery = `
+        query GetUserProfiles {
+          profiles {
+            _id
+            full_name
+            avatar
+            AdminId
+          }
         }
-      );
+      `;
+      
+      // Realizar la consulta GraphQL
+      const response = await fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: graphqlQuery
+        })
+      });
 
-      if (!response.ok) {
-        throw new Error("Error al cargar los perfiles");
+      const result = await response.json();
+      
+      // Verificar errores en la respuesta GraphQL
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Error en la consulta GraphQL');
       }
-
-      const profiles = await response.json();
+      
+      // Obtener los perfiles de la respuesta
+      const profiles = result.data.profiles;
 
       // Renderizar perfiles
       renderProfiles(profiles);
@@ -186,18 +220,115 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Mostrar mensaje de error
       profilesContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-danger text-center">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Error al cargar perfiles
-                        <div class="mt-3">
-                            <button class="btn btn-outline-danger" onclick="window.location.reload()">
-                                <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        <div class="col-12">
+          <div class="alert alert-danger text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Error al cargar perfiles
+            <div class="mt-3">
+              <button class="btn btn-outline-danger" onclick="window.location.reload()">
+                <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Maneja la búsqueda de perfiles
+   */
+  async function handleProfileSearch() {
+    const searchTerm = searchProfileInput.value.trim();
+
+    if (!searchTerm) {
+      // Si no hay término de búsqueda, cargar todos los perfiles
+      return loadProfiles();
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Mostrar indicador de carga
+      profilesContainer.innerHTML = `
+        <div class="col-12 text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Buscando...</span>
+          </div>
+          <p class="mt-3">Buscando "${searchTerm}"...</p>
+        </div>
+      `;
+
+      // Como no hay una query específica para buscar perfiles en el esquema GraphQL actual,
+      // obtenemos todos los perfiles y filtramos en el cliente
+      const graphqlQuery = `
+        query GetUserProfiles {
+          profiles {
+            _id
+            full_name
+            avatar
+            AdminId
+          }
+        }
+      `;
+      
+      const response = await fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: graphqlQuery
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Error en la búsqueda GraphQL');
+      }
+      
+      // Filtrar perfiles por nombre
+      const profiles = result.data.profiles;
+      const filteredProfiles = profiles.filter(profile => 
+        profile.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      // Renderizar resultados
+      if (filteredProfiles.length === 0) {
+        profilesContainer.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-info text-center">
+              <i class="bi bi-search me-2"></i>
+              No se encontraron perfiles con el nombre "${searchTerm}"
+              <div class="mt-3">
+                <button class="btn btn-outline-primary" onclick="loadProfiles()">
+                  <i class="bi bi-arrow-left me-2"></i>Ver todos los perfiles
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        renderProfiles(filteredProfiles);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      
+      profilesContainer.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Error al buscar perfiles
+            <div class="mt-3">
+              <button class="btn btn-outline-danger" onclick="window.location.reload()">
+                <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
     }
   }
 
@@ -211,18 +342,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Si no hay perfiles, mostrar un mensaje y un botón para crear
     if (profiles.length === 0) {
       profilesContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-info text-center">
-                        <i class="bi bi-people me-2"></i>
-                        No hay perfiles infantiles
-                        <div class="mt-3">
-                            <button id="createFirstProfileBtn" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>Crear primer perfil
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            <i class="bi bi-people me-2"></i>
+            No hay perfiles infantiles
+            <div class="mt-3">
+              <button id="createFirstProfileBtn" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Crear primer perfil
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
 
       // Agregar evento al botón de crear primer perfil para verificar PIN
       const createFirstProfileBtn = document.getElementById(
@@ -242,12 +373,17 @@ document.addEventListener("DOMContentLoaded", function () {
       const profileCol = document.createElement("div");
       profileCol.className = "col-6 col-sm-4 col-md-3";
 
+      // Determinar qué avatar mostrar
+      const avatarUrl = Array.isArray(profile.avatar) && profile.avatar.length > 0 
+        ? profile.avatar[0] 
+        : 'https://loodibee.com/wp-content/uploads/Netflix-avatar-2.png';
+
       profileCol.innerHTML = `
-                <div class="profile-card" data-profile-id="${profile._id}" data-profile-name="${profile.full_name}" data-profile-avatar="${profile.avatar}">
-                    <img src="${profile.avatar}" alt="${profile.full_name}" class="profile-avatar">
-                    <h5 class="profile-name">${profile.full_name}</h5>
-                </div>
-            `;
+        <div class="profile-card" data-profile-id="${profile._id}" data-profile-name="${profile.full_name}" data-profile-avatar="${avatarUrl}">
+          <img src="${avatarUrl}" alt="${profile.full_name}" class="profile-avatar">
+          <h5 class="profile-name">${profile.full_name}</h5>
+        </div>
+      `;
 
       // Añadir evento click para seleccionar el perfil
       const profileCard = profileCol.querySelector(".profile-card");
@@ -393,13 +529,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Mostrar indicador de carga
     profileNameInModal.innerHTML = `
-            <div class="d-flex align-items-center">
-                <span class="me-2">${selectedProfile.full_name}</span>
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Verificando...</span>
-                </div>
-            </div>
-        `;
+      <div class="d-flex align-items-center">
+        <span class="me-2">${selectedProfile.full_name}</span>
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Verificando...</span>
+        </div>
+      </div>
+    `;
 
     // Verificar el PIN
     try {
@@ -409,6 +545,8 @@ document.addEventListener("DOMContentLoaded", function () {
         token ? "disponible" : "no disponible"
       );
 
+      // NOTA: Como no hay una mutación específica para verificar PIN en el esquema GraphQL actual,
+      // seguiremos usando la API REST existente para esta funcionalidad específica
       const response = await fetch(
         "http://localhost:3000/api/public/verify-pin",
         {
@@ -487,21 +625,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Alterna la habilitación de los botones del teclado numérico
-   * @param {boolean} disabled - True para deshabilitar, false para habilitar
-   */
-  function togglePinpadButtons(disabled) {
-    pinButtons.forEach((button) => {
-      button.disabled = disabled;
-      if (disabled) {
-        button.classList.add("disabled");
-      } else {
-        button.classList.remove("disabled");
-      }
-    });
-  }
-
-  /**
    * Verifica el PIN del administrador
    * Este método verifica el PIN contra el valor almacenado en localStorage
    */
@@ -558,6 +681,21 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
+   * Alterna la habilitación de los botones del teclado numérico
+   * @param {boolean} disabled - True para deshabilitar, false para habilitar
+   */
+  function togglePinpadButtons(disabled) {
+    pinButtons.forEach((button) => {
+      button.disabled = disabled;
+      if (disabled) {
+        button.classList.add("disabled");
+      } else {
+        button.classList.remove("disabled");
+      }
+    });
+  }
+
+  /**
    * Muestra un mensaje de error para el PIN
    * @param {string} message - Mensaje de error opcional
    */
@@ -610,9 +748,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Mostrar indicador de carga
       switchAccountBtn.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Cerrando sesión...
-            `;
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Cerrando sesión...
+      `;
       switchAccountBtn.disabled = true;
 
       const response = await fetch("http://localhost:3000/api/session", {
