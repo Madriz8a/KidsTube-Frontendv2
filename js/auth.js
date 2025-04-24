@@ -340,35 +340,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(window.Notifications.mapApiErrorToFrontend(data.error));
                 }
                 
+                // Verificar si es la primera fase de autenticación (verificación SMS requerida)
+                if (data.tempToken && data.message === 'Verification code sent to your phone') {
+                    // Guardar token temporal y último dígitos del teléfono en sessionStorage
+                    sessionStorage.setItem('tempToken', data.tempToken);
+                    
+                    if (data.phone) {
+                        sessionStorage.setItem('phoneNumber', data.phone);
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    window.Notifications.showSuccess('verification_code_sent', 'Código enviado');
+                    
+                    // Redireccionar a la página de verificación SMS
+                    setTimeout(() => {
+                        window.location.href = 'smsVerification.html';
+                    }, 1000);
+                    
+                    return;
+                }
+                
+                // Si llegamos aquí, significa que no se requiere verificación SMS (flujo antiguo)
                 // Obtener información del usuario decodificando el token
                 const token = data.token;
                 const payload = JSON.parse(atob(token.split('.')[1]));
-                
-                // Obtener el PIN del usuario y guardarlo en localStorage
-                try {
-                    const userResponse = await fetch(`${API_URL}/users?id=${payload.id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (userResponse.ok) {
-                        const userData = await userResponse.json();
-                        if (userData && userData.pin) {
-                            // Guardar el PIN del administrador
-                            localStorage.setItem('adminPin', userData.pin);
-                        } else {
-                            // PIN por defecto como respaldo
-                            localStorage.setItem('adminPin', '123456');
-                            console.warn('No se pudo obtener el PIN, usando PIN por defecto');
-                        }
-                    }
-                } catch (pinError) {
-                    console.error('Error al obtener el PIN:', pinError);
-                    localStorage.setItem('adminPin', '123456');
-                }
                 
                 // Guardar datos
                 saveAuthData(payload, token);
