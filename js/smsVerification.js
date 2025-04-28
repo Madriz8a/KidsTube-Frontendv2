@@ -95,6 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Guardar el token JWT en localStorage
             localStorage.setItem('token', data.token);
             
+            // CAMBIO: Guardar el PIN de administrador si está en la respuesta
+            if (data.pin) {
+                localStorage.setItem('adminPin', data.pin);
+            }
+            
             // Obtener información del usuario desde el token
             const payload = JSON.parse(atob(data.token.split('.')[1]));
             
