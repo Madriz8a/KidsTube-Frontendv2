@@ -327,3 +327,57 @@ label i {
     transform: translate(-50%, -50%) !important;
     margin: 0 !important;
 }
+
+/* Estilos para botones de Google */
+.google-btn {
+    background-color: white;
+    color: #444;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 16px;
+}
+
+.google-btn:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.separator-or {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6c757d;
+    margin: 1rem 0;
+}
+
+.separator-or::before, 
+.separator-or::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.separator-or span {
+    padding: 0 10px;
+}
+
+/* Estilos para la página de completar perfil */
+.complete-profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-completion-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
