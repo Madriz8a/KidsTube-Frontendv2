@@ -5,6 +5,10 @@ const errorMessages = {
     'auth_email_exists': 'Ya existe una cuenta con este correo electrónico.',
     'auth_account_locked': 'Tu cuenta ha sido bloqueada temporalmente. Por favor, intenta más tarde.',
     'auth_not_authenticated': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+    'validation_age_requirement': 'Debes ser mayor de 18 años para registrarte.',
+    'profile_complete_failed': 'No se pudo completar tu perfil. Por favor, inténtalo de nuevo.',
+    'missing_token': 'Token de autenticación no encontrado. Por favor, inicia sesión nuevamente.',
+    'google_auth_failed': 'Error en la autenticación con Google. Por favor, inténtalo de nuevo.',
     
     // Errores de validación de formularios
     'validation_required': 'Este campo es obligatorio.',
@@ -49,6 +53,7 @@ const successMessages = {
     'auth_login_success': 'Has iniciado sesión correctamente.',
     'auth_register_success': 'Registro exitoso. Bienvenido/a a KidsTube.',
     'auth_logout_success': 'Has cerrado sesión correctamente.',
+    'profile_complete_success': 'Perfil completado correctamente. ¡Bienvenido/a a KidsTube!',
     
     // Perfiles
     'profile_create_success': 'Perfil creado correctamente.',

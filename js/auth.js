@@ -99,6 +99,42 @@ function updateUserUI() {
 // Evento para formulario de registro
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Inicializando auth.js...');
+
+     // Verificar si hay un token en la URL (redirección desde Google)
+     const urlParams = new URLSearchParams(window.location.search);
+     const token = urlParams.get('token');
+     
+     if (token) {
+         // Guardar el token en localStorage
+         localStorage.setItem('token', token);
+         
+         // Decodificar el token para obtener información del usuario
+         const payload = JSON.parse(atob(token.split('.')[1]));
+         
+         // Guardar datos del usuario
+         localStorage.setItem('adminId', payload.id);
+         if (payload.name) {
+             localStorage.setItem('userName', payload.name);
+         } else if (payload.email) {
+             localStorage.setItem('userName', payload.email);
+         }
+         
+         // Mostrar mensaje de éxito
+         if (window.Notifications) {
+             window.Notifications.showSuccess('auth_login_success');
+         }
+         
+         // Limpiar la URL para no exponer el token
+         history.replaceState({}, document.title, window.location.pathname);
+     }
+     
+     // Verificar si hay un error en la URL
+     const error = urlParams.get('error');
+     if (error && window.Notifications) {
+         window.Notifications.showError(error);
+         // Limpiar la URL
+         history.replaceState({}, document.title, window.location.pathname);
+     }
     
     if (document.getElementById('userDisplayName')) {
         updateUserUI();
