@@ -29,12 +29,27 @@ const loginReasons = {
     
     console.log('Verificando acceso a:', path);
     
+    // NUEVO: Comprobar si estamos recibiendo un token de autenticación por hash fragment
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const incomingToken = hashParams.get('token');
+    
+    if (incomingToken) {
+        console.log('Token detectado en hash fragment, permitiendo acceso temporal...');
+        return true;
+    }
+    
     // Detectar si es una página de administrador (método más robusto)
     const isAdminPage = path.includes('/admin/') || adminPages.includes(currentPage);
     
     // Si es una página pública, no verificar autenticación
     if (publicPages.includes(currentPage)) {
         console.log('Página pública, acceso permitido');
+        return true;
+    }
+    
+    // NUEVO: Permitir acceso a completeGoogleProfile.html
+    if (currentPage === 'completeGoogleProfile.html') {
+        console.log('Página de completar perfil Google, acceso permitido');
         return true;
     }
     

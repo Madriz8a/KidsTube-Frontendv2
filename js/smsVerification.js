@@ -7,19 +7,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const countdownTimer = document.getElementById('countdownTimer');
     const countdownValue = document.getElementById('countdownValue');
     
+    // Verificar el hash fragment para tokens desde Google auth
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const hashToken = hashParams.get('token');
+    const hashPhone = hashParams.get('phone');
+    
+    if (hashToken) {
+        // Guardar token en sessionStorage
+        sessionStorage.setItem('tempToken', hashToken);
+        console.log('Token encontrado en hash fragment y guardado');
+        
+        // Limpiar hash fragment
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+    
+    if (hashPhone) {
+        // Guardar número de teléfono en sessionStorage
+        sessionStorage.setItem('phoneNumber', hashPhone);
+    }
+    
     // Obtener datos de la sesión
     const tempToken = sessionStorage.getItem('tempToken');
     const phoneNumber = sessionStorage.getItem('phoneNumber');
     
     // Si no hay token temporal, redireccionar al login
     if (!tempToken) {
-        window.location.href = 'login.html';
+        console.error('No se encontró token temporal en sessionStorage');
+        window.location.href = 'login.html#error=missing_temp_token';
         return;
     }
     
     // Mostrar los últimos 4 dígitos del número de teléfono
     if (phoneNumber) {
         phoneDisplay.textContent = '********' + phoneNumber;
+    } else {
+        phoneDisplay.textContent = '**** *** ****';
+        console.warn('No se encontró el número de teléfono para mostrar');
     }
     
     // Iniciar contador para reenvío
@@ -41,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initCountdown() {
         let countdown = 60;
+        resendCodeBtn.disabled = true;
+        countdownTimer.style.display = 'block';
+        
         const countdownInterval = setInterval(() => {
             countdown--;
             countdownValue.textContent = countdown;
@@ -86,11 +114,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
             
-            const data = await response.json();
+            // Intenta parsear la respuesta como JSON
+            let data;
+            try {
+                data = await response.json();
+            } catch (err) {
+                console.error('Error al parsear respuesta JSON:', err);
+                throw new Error('Error en formato de respuesta del servidor');
+            }
             
+            // Verificar si la respuesta fue exitosa
             if (!response.ok) {
+                console.error('Error en verificación:', response.status, data);
                 throw new Error(data.error || 'Error en la verificación');
             }
+            
+            console.log('Verificación exitosa, token recibido');
             
             // Guardar el token JWT en localStorage
             localStorage.setItem('token', data.token);
@@ -124,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
             
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error en verificación SMS:', error);
             
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(verificationForm, false);
@@ -155,8 +194,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ token })
             });
             
+            const data = await response.json();
+            
             if (!response.ok) {
-                throw new Error('Error al reenviar el código');
+                throw new Error(data.error || 'Error al reenviar el código');
+            }
+            
+            // Si recibimos un nuevo phone number, actualizarlo
+            if (data.phone) {
+                sessionStorage.setItem('phoneNumber', data.phone);
+                phoneDisplay.textContent = '********' + data.phone;
             }
             
             // Mostrar mensaje de éxito
@@ -171,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             initCountdown();
             
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error al reenviar código:', error);
             resendCodeBtn.innerHTML = 'Reenviar código';
             resendCodeBtn.disabled = false;
             window.Notifications.showError('code_resend_failed', 'Error al reenviar el código');
