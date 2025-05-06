@@ -1,3 +1,6 @@
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener("DOMContentLoaded", function () {
   const welcomeTitle = document.getElementById("welcomeTitle");
   const profileName = document.getElementById("profileName");
@@ -50,16 +53,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Verificar si existe token
     const token = localStorage.getItem("token");
-    console.log("¿Existe token?", !!token);
 
     if (!token) {
-      // Si no hay token de administrador, intentar obtenerlo
-      // Esto es solo temporal para depuración
-      console.error("No hay token de administrador en localStorage");
-      alert(
-        "No se encontró el token de administrador. Por favor, inicie sesión nuevamente."
-      );
-      window.location.href = "../shared/login.html"; // Redirigir a la página de inicio de sesión
+      // Si no hay token de administrador, redirigir a login
+      window.location.href = "../shared/login.html";
       return;
     }
 
@@ -113,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       searchInput.value = "";
       
       document.getElementById("playlistsContainer").style.display = "block";
-  });
+    });
 
     // Evento para reproducción automática
     autoplaySwitch.addEventListener("change", function () {
@@ -134,74 +131,82 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Carga las playlists asignadas al perfil
-   */
-  async function loadPlaylists() {
-    try {
-      console.log(
-        "Cargando playlists para el perfil:",
-        currentProfile.full_name
-      );
-      console.log("PIN utilizado:", currentProfile.pin);
-      console.log("Profile ID:", currentProfile._id);
+ * Carga las playlists asignadas al perfil usando GraphQL
+ */
+async function loadPlaylists() {
+  try {
+    // Obtenemos el token del administrador para mayor compatibilidad
+    const token = localStorage.getItem("token");
 
-      // Obtenemos el token del administrador para mayor compatibilidad
-      const token = localStorage.getItem("token");
-
-      // Importante: Asegurarnos de usar el endpoint correcto que filtra por ID del perfil
-      const response = await fetch(
-        `http://localhost:3000/api/restricted/playlists?profileId=${currentProfile._id}`,
-        {
-          method: "GET",
-          headers: {
-            "x-restricted-pin": currentProfile.pin,
-            "Authorization": `Bearer ${token}`, // Añadimos el token del administrador
-          },
+    // Mostrar indicador de carga
+    loadingIndicator.style.display = "block";
+    
+    // Consulta GraphQL para obtener playlists por ID de perfil
+    const graphqlQuery = `
+      query GetPlaylistsByProfile($profileId: ID!) {
+        playlistsByProfile(profileId: $profileId) {
+          _id
+          name
+          associatedProfiles
+          adminId
+          createdAt
+          videoCount
         }
-      );
-
-      // Log para depuración
-      console.log("Respuesta de la API:", response.status, response.statusText);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error de API:", errorText);
-        throw new Error(
-          `Error al cargar las playlists: ${response.status} ${response.statusText}`
-        );
       }
-
-      playlists = await response.json();
-      console.log("Playlists recibidas:", playlists);
-
-      // Ocultar el indicador de carga
-      loadingIndicator.style.display = "none";
-
-      // Mostrar playlists
-      if (playlists && playlists.length > 0) {
-        renderPlaylists(playlists);
-      } else {
-        console.log("No se encontraron playlists para este perfil");
-        noPlaylistsMessage.style.display = "block";
-      }
-    } catch (error) {
-      console.error("Error al cargar playlists:", error);
-      loadingIndicator.style.display = "none";
-      noPlaylistsMessage.style.display = "block";
-
-      // Mostrar mensaje de error más específico
-      noPlaylistsMessage.innerHTML = `
-                <div class="empty-state">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <h3>No se pudieron cargar las playlists</h3>
-                    <p>Hubo un problema al comunicarse con el servidor. ${error.message}</p>
-                    <button class="btn btn-primary mt-3" onclick="window.location.reload()">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Intentar de nuevo
-                    </button>
-                </div>
-            `;
+    `;
+    
+    // Realizar la consulta GraphQL
+    const response = await fetch(GRAPHQL_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-restricted-pin': currentProfile.pin,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        query: graphqlQuery,
+        variables: {
+          profileId: currentProfile._id
+        }
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Verificar errores en la respuesta GraphQL
+    if (result.errors) {
+      throw new Error(result.errors[0].message || 'Error al obtener playlists');
     }
+    
+    // Obtener las playlists de la respuesta
+    playlists = result.data.playlistsByProfile;
+
+    // Ocultar el indicador de carga
+    loadingIndicator.style.display = "none";
+
+    // Mostrar playlists
+    if (playlists && playlists.length > 0) {
+      renderPlaylists(playlists);
+    } else {
+      noPlaylistsMessage.style.display = "block";
+    }
+  } catch (error) {
+    loadingIndicator.style.display = "none";
+    noPlaylistsMessage.style.display = "block";
+
+    // Mostrar mensaje de error más específico
+    noPlaylistsMessage.innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-exclamation-triangle"></i>
+        <h3>No se pudieron cargar las playlists</h3>
+        <p>Hubo un problema al comunicarse con el servidor.</p>
+        <button class="btn btn-primary mt-3" onclick="window.location.reload()">
+          <i class="bi bi-arrow-clockwise me-2"></i>Intentar de nuevo
+        </button>
+      </div>
+    `;
   }
+}
 
   /**
    * Renderiza las playlists en la interfaz
@@ -222,13 +227,13 @@ document.addEventListener("DOMContentLoaded", function () {
       sectionHeader.className =
         "section-header d-flex justify-content-between align-items-center mb-3";
       sectionHeader.innerHTML = `
-                <h2 class="section-title">
-                    <i class="bi bi-collection-play me-2"></i> ${playlist.name}
-                </h2>
-                <span class="badge bg-primary rounded-pill video-count">${
-                  playlist.videoCount || 0
-                } videos</span>
-            `;
+        <h2 class="section-title">
+          <i class="bi bi-collection-play me-2"></i> ${playlist.name}
+        </h2>
+        <span class="badge bg-primary rounded-pill video-count">${
+          playlist.videoCount || 0
+        } videos</span>
+      `;
 
       // Contenedor para los videos de esta playlist
       const videosRow = document.createElement("div");
@@ -237,13 +242,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Añadir un indicador de carga para los videos
       videosRow.innerHTML = `
-                <div class="col-12 text-center py-3">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando videos...</span>
-                    </div>
-                    <p class="mt-2">Cargando videos...</p>
-                </div>
-            `;
+        <div class="col-12 text-center py-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando videos...</span>
+          </div>
+          <p class="mt-2">Cargando videos...</p>
+        </div>
+      `;
 
       // Añadir sección al contenedor principal
       playlistSection.appendChild(sectionHeader);
@@ -260,60 +265,69 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Carga los videos para una playlist específica
+   * Carga los videos para una playlist específica usando GraphQL
    * @param {string} playlistId - ID de la playlist
    * @param {HTMLElement} container - Contenedor donde mostrar los videos
    */
   async function loadVideosForPlaylist(playlistId, container) {
     try {
-      console.log(`Cargando videos para playlist: ${playlistId}`);
-
       // Obtenemos el token del administrador para mayor compatibilidad
       const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        `http://localhost:3000/api/restricted/videos?playlistId=${playlistId}`,
-        {
-          method: "GET",
-          headers: {
-            "x-restricted-pin": currentProfile.pin,
-            "Authorization": `Bearer ${token}`,
-          },
+      // Consulta GraphQL para obtener videos por playlist
+      const graphqlQuery = `
+        query GetVideosByPlaylist($playlistId: ID!) {
+          videosByPlaylist(playlistId: $playlistId) {
+            _id
+            name
+            youtubeUrl
+            description
+            playlistId
+            adminId
+            createdAt
+          }
         }
-      );
-
-      // Log para depuración
-      console.log(
-        "Respuesta de API de videos:",
-        response.status,
-        response.statusText
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error de API (videos):", errorText);
-        throw new Error(
-          `Error al cargar los videos: ${response.status} ${response.statusText}`
-        );
+      `;
+      
+      // Realizar la consulta GraphQL
+      const response = await fetch(GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-restricted-pin': currentProfile.pin,
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: graphqlQuery,
+          variables: {
+            playlistId: playlistId
+          }
+        })
+      });
+      
+      const result = await response.json();
+      
+      // Verificar errores en la respuesta GraphQL
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Error al obtener videos');
       }
-
-      const videos = await response.json();
-      console.log(`Videos recibidos para playlist ${playlistId}:`, videos);
+      
+      // Obtener los videos de la respuesta
+      const videos = result.data.videosByPlaylist;
 
       // Limpiar el contenedor
       container.innerHTML = "";
 
       if (!videos || videos.length === 0) {
-        console.log(`No hay videos en la playlist ${playlistId}`);
         // Mostrar mensaje de que no hay videos
         container.innerHTML = `
-                    <div class="col-12">
-                        <div class="empty-playlist">
-                            <i class="bi bi-camera-video-off"></i>
-                            <p>No hay videos en esta playlist</p>
-                        </div>
-                    </div>
-                `;
+          <div class="col-12">
+            <div class="empty-playlist">
+              <i class="bi bi-camera-video-off"></i>
+              <p>No hay videos en esta playlist</p>
+            </div>
+          </div>
+        `;
         return;
       }
 
@@ -323,18 +337,17 @@ document.addEventListener("DOMContentLoaded", function () {
         container.appendChild(videoCard);
       });
     } catch (error) {
-      console.error("Error al cargar videos:", error);
       container.innerHTML = `
-                <div class="col-12">
-                    <div class="empty-playlist">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <p>Error al cargar los videos: ${error.message}</p>
-                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadVideosForPlaylist('${playlistId}', this.parentNode.parentNode.parentNode)">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
-                        </button>
-                    </div>
-                </div>
-            `;
+        <div class="col-12">
+          <div class="empty-playlist">
+            <i class="bi bi-exclamation-triangle"></i>
+            <p>Error al cargar los videos</p>
+            <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadVideosForPlaylist('${playlistId}', this.parentNode.parentNode.parentNode)">
+              <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
+            </button>
+          </div>
+        </div>
+      `;
     }
   }
 
@@ -357,27 +370,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Construir la tarjeta de video
     videoCol.innerHTML = `
-            <div class="video-card" data-video-id="${
-              video._id
-            }" data-playlist-id="${playlistId}">
-                <div class="video-thumbnail">
-                    <img src="${thumbnailUrl}" alt="${
-      video.name
-    }" class="video-thumbnail-img">
-                    <div class="play-overlay">
-                        <i class="bi bi-play-circle-fill"></i>
-                    </div>
-                </div>
-                <div class="video-info">
-                    <h5 class="video-title">${video.name}</h5>
-                    <p class="video-playlist-name">
-                        <i class="bi bi-collection-play"></i> ${getPlaylistName(
-                          playlistId
-                        )}
-                    </p>
-                </div>
-            </div>
-        `;
+      <div class="video-card" data-video-id="${video._id}" data-playlist-id="${playlistId}">
+        <div class="video-thumbnail">
+          <img src="${thumbnailUrl}" alt="${video.name}" class="video-thumbnail-img">
+          <div class="play-overlay">
+            <i class="bi bi-play-circle-fill"></i>
+          </div>
+        </div>
+        <div class="video-info">
+          <h5 class="video-title">${video.name}</h5>
+          <p class="video-playlist-name">
+            <i class="bi bi-collection-play"></i> ${getPlaylistName(playlistId)}
+          </p>
+        </div>
+      </div>
+    `;
 
     // Añadir evento click para reproducir el video
     const videoCard = videoCol.querySelector(".video-card");
@@ -406,8 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
    * @returns {string|null} - ID del video o null si no es válida
    */
   function extractYouTubeId(url) {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
 
     return match && match[2].length === 11 ? match[2] : null;
@@ -425,9 +431,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
         const token = localStorage.getItem("token");
+        
         // Mostrar sección de resultados con indicador de carga
         searchResultsSection.style.display = "block";
-        
         document.getElementById("playlistsContainer").style.display = "none";
         
         searchResults.innerHTML = `
@@ -439,7 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-        // MODIFICADO: Usar GraphQL en lugar de REST para la búsqueda de videos
+        // Usar GraphQL para la búsqueda de videos
         const graphqlQuery = `
           query SearchVideos($searchTerm: String!) {
             searchVideos(searchTerm: $searchTerm) {
@@ -454,7 +460,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         
         // Realizar la consulta GraphQL
-        const response = await fetch('http://localhost:4000/graphql', {
+        const response = await fetch(GRAPHQL_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -497,7 +503,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Renderizar cada video encontrado
-        videos.forEach((video, index) => {
+        videos.forEach(video => {
             // Determinar a qué playlist pertenece el video
             const playlistId = video.playlistId;
 
@@ -506,7 +512,6 @@ document.addEventListener("DOMContentLoaded", function () {
             searchResults.appendChild(videoCard);
         });
     } catch (error) {
-        console.error("Error:", error);
         searchResults.innerHTML = `
             <div class="col-12">
                 <div class="empty-state">
@@ -571,26 +576,25 @@ document.addEventListener("DOMContentLoaded", function () {
       // Crear iframe para el reproductor
       const autoplay = autoplaySwitch.checked ? "1" : "0";
       videoPlayer.innerHTML = `
-                <iframe 
-                    src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
-            `;
+        <iframe 
+          src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
+          title="YouTube video player" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      `;
 
       // Mostrar el modal
       const modalInstance = new bootstrap.Modal(videoPlayerModal);
       modalInstance.show();
     } catch (error) {
-      console.error("Error:", error);
       alert("Error al reproducir el video");
     }
   }
 
   /**
-   * Carga los videos de una playlist para la navegación
+   * Carga los videos de una playlist para la navegación usando GraphQL
    * @param {string} playlistId - ID de la playlist
    */
   async function loadPlaylistVideosForNavigation(playlistId) {
@@ -598,24 +602,47 @@ document.addEventListener("DOMContentLoaded", function () {
       // Obtener el token del localStorage
       const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        `http://localhost:3000/api/restricted/videos?playlistId=${playlistId}`,
-        {
-          method: "GET",
-          headers: {
-            "x-restricted-pin": currentProfile.pin,
-            "Authorization": `Bearer ${token}`,
-          },
+      // Consulta GraphQL para obtener videos por playlist
+      const graphqlQuery = `
+        query GetVideosByPlaylist($playlistId: ID!) {
+          videosByPlaylist(playlistId: $playlistId) {
+            _id
+            name
+            youtubeUrl
+            description
+            playlistId
+            adminId
+            createdAt
+          }
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al cargar los videos de la playlist");
+      `;
+      
+      // Realizar la consulta GraphQL
+      const response = await fetch(GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-restricted-pin': currentProfile.pin,
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: graphqlQuery,
+          variables: {
+            playlistId: playlistId
+          }
+        })
+      });
+      
+      const result = await response.json();
+      
+      // Verificar errores en la respuesta GraphQL
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Error al obtener videos');
       }
-
-      currentPlaylistVideos = await response.json();
+      
+      // Obtener los videos de la respuesta
+      currentPlaylistVideos = result.data.videosByPlaylist;
     } catch (error) {
-      console.error("Error:", error);
       currentPlaylistVideos = [];
     }
   }
@@ -656,14 +683,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear iframe para el reproductor
         const autoplay = autoplaySwitch.checked ? "1" : "0";
         videoPlayer.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
+          <iframe 
+            src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        `;
       }
 
       // Actualizar botones de navegación
@@ -690,14 +717,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear iframe para el reproductor
         const autoplay = autoplaySwitch.checked ? "1" : "0";
         videoPlayer.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
+          <iframe 
+            src="https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&rel=0" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        `;
       }
 
       // Actualizar botones de navegación

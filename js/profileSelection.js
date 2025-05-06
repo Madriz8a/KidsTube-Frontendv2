@@ -1,3 +1,6 @@
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener("DOMContentLoaded", function () {
   const profilesContainer = document.getElementById("profilesContainer");
   const switchAccountBtn = document.getElementById("switchAccountBtn");
@@ -192,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
       
       // Realizar la consulta GraphQL
-      const response = await fetch('http://localhost:4000/graphql', {
+      const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,8 +219,6 @@ document.addEventListener("DOMContentLoaded", function () {
       // Renderizar perfiles
       renderProfiles(profiles);
     } catch (error) {
-      console.error("Error:", error);
-
       // Mostrar mensaje de error
       profilesContainer.innerHTML = `
         <div class="col-12">
@@ -272,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       `;
       
-      const response = await fetch('http://localhost:4000/graphql', {
+      const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -314,8 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
         renderProfiles(filteredProfiles);
       }
     } catch (error) {
-      console.error("Error:", error);
-      
       profilesContainer.innerHTML = `
         <div class="col-12">
           <div class="alert alert-danger text-center">
@@ -522,8 +521,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    console.log("Verificando PIN para perfil:", selectedProfile.full_name);
-
     // Deshabilitar botones durante la verificación
     togglePinpadButtons(true);
 
@@ -540,15 +537,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Verificar el PIN
     try {
       const token = localStorage.getItem("token");
-      console.log(
-        "Token usado para verificación:",
-        token ? "disponible" : "no disponible"
-      );
 
       // NOTA: Como no hay una mutación específica para verificar PIN en el esquema GraphQL actual,
       // seguiremos usando la API REST existente para esta funcionalidad específica
       const response = await fetch(
-        "http://localhost:3000/api/public/verify-pin",
+        `${API_URL}/public/verify-pin`,
         {
           method: "POST",
           headers: {
@@ -562,12 +555,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       );
 
-      console.log(
-        "Respuesta de verificación PIN:",
-        response.status,
-        response.statusText
-      );
-
       // Habilitar botones después de la verificación
       togglePinpadButtons(false);
 
@@ -577,17 +564,15 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // PIN correcto, guardar información del perfil
         const verifiedProfile = await response.json();
-        console.log("Perfil verificado:", verifiedProfile);
 
         // Almacenar datos del perfil seleccionado en localStorage
         const profileData = {
-          _id: selectedProfile._id, // Usamos el ID del perfil seleccionado para mayor seguridad
+          _id: selectedProfile._id, 
           full_name: selectedProfile.full_name,
           avatar: selectedProfile.avatar,
           pin: enteredPin, // Guardamos el PIN para solicitudes futuras
         };
 
-        console.log("Datos de perfil a guardar:", profileData);
         localStorage.setItem("currentProfile", JSON.stringify(profileData));
 
         // Cerrar el modal
@@ -597,10 +582,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Redireccionar al dashboard infantil
         window.location.href = "kidsDashboard.html";
       } else {
-        console.error("PIN incorrecto o error en verificación");
-        const errorText = await response.text();
-        console.error("Detalles del error:", errorText);
-
         // Incrementar contador de intentos
         pinAttempts++;
 
@@ -608,8 +589,6 @@ document.addEventListener("DOMContentLoaded", function () {
         showPinError();
       }
     } catch (error) {
-      console.error("Error al verificar PIN:", error);
-
       // Habilitar botones después de la verificación
       togglePinpadButtons(false);
 
@@ -633,7 +612,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const adminPin = localStorage.getItem("adminPin");
 
     if (!adminPin) {
-      console.error("No se encontró el PIN del administrador");
       showPinError("No se encontraron datos del administrador");
       return;
     }
@@ -753,7 +731,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
       switchAccountBtn.disabled = true;
 
-      const response = await fetch("http://localhost:3000/api/session", {
+      const response = await fetch(`${API_URL}/session`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -775,8 +753,6 @@ document.addEventListener("DOMContentLoaded", function () {
       // Redirigir a la página de login
       window.location.href = "../shared/login.html";
     } catch (error) {
-      console.error("Error:", error);
-
       // Incluso si hay error, limpiar localStorage y redireccionar
       localStorage.removeItem("token");
       localStorage.removeItem("adminId");

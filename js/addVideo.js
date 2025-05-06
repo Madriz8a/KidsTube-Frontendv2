@@ -1,3 +1,6 @@
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Referencias a elementos del DOM
     const addVideoForm = document.getElementById('addVideoForm');
@@ -138,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga la información de la playlist
+     * Carga la información de la playlist usando GraphQL
      * @param {string} playlistId - ID de la playlist
      */
     async function loadPlaylistInfo(playlistId) {
@@ -152,25 +155,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener datos de la playlist
+            const graphqlQuery = `
+                query GetPlaylist($id: ID!) {
+                    playlist(id: $id) {
+                        _id
+                        name
+                        associatedProfiles
+                        adminId
+                        createdAt
+                        videoCount
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery,
+                    variables: {
+                        id: playlistId
+                    }
+                })
             });
             
-            if (!response.ok) {
-                throw new Error('Error al cargar la información de la playlist');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener datos de la playlist');
             }
             
-            const playlistData = await response.json();
+            // Obtener la playlist de la respuesta
+            const playlistData = result.data.playlist;
             currentPlaylistName = playlistData.name;
             
             // Mostrar el nombre de la playlist en la insignia
             playlistNameBadge.textContent = currentPlaylistName;
             
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('playlist_not_found', 'Playlist no encontrada');
             
             // Añadir botón para volver al dashboard
@@ -264,8 +292,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1500);
             }
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(addVideoForm, false);
             
@@ -317,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('No se ha iniciado sesión');
         }
         
-        const response = await fetch('http://localhost:3000/api/admin/videos', {
+        const response = await fetch(`${API_URL}/admin/videos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -363,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Realizar la búsqueda usando la API de YouTube integrada en el backend
-            const response = await fetch(`http://localhost:3000/api/youtube/search?q=${encodeURIComponent(query)}`, {
+            const response = await fetch(`${API_URL}/youtube/search?q=${encodeURIComponent(query)}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -388,8 +414,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
         } catch (error) {
-            console.error('Error en la búsqueda:', error);
-            
             // Ocultar indicador de carga
             searchLoadingIndicator.style.display = 'none';
             
@@ -566,8 +590,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1500);
             }
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(selectedVideoForm, false);
             
@@ -587,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/session', {
+            const response = await fetch(`${API_URL}/session`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -605,8 +627,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '../shared/login.html';
             }, 1000);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Incluso si hay error, limpiamos el almacenamiento y redirigimos
             localStorage.removeItem('token');
             localStorage.removeItem('adminId');

@@ -1,3 +1,7 @@
+// Variables de entorno para las URLs de la API
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener('DOMContentLoaded', function() {
     const editProfileForm = document.getElementById('editProfileForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -145,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga los datos del perfil
+     * Carga los datos del perfil usando GraphQL
      * @param {string} profileId - ID del perfil a editar
      */
     async function loadProfileData(profileId) {
@@ -159,19 +163,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Obtener datos del perfil
-            const profileResponse = await fetch(`http://localhost:3000/api/admin/restricted_users?id=${profileId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener datos del perfil
+            const graphqlQuery = `
+                query GetProfile($id: ID!) {
+                    profile(id: $id) {
+                        _id
+                        full_name
+                        avatar
+                        AdminId
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery,
+                    variables: {
+                        id: profileId
+                    }
+                })
             });
             
-            if (!profileResponse.ok) {
-                throw new Error('Error al cargar los datos del perfil');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener datos del perfil');
             }
             
-            profileData = await profileResponse.json();
+            // Obtener el perfil de la respuesta
+            profileData = result.data.profile;
             
             // Mostrar datos del perfil
             displayProfileData(profileData);
@@ -183,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingIndicator.style.display = 'none';
             editProfileForm.style.display = 'block';
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('profile_not_found');
             
             // Ocultar indicador de carga y mostrar mensaje de error
@@ -222,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga las playlists disponibles y marca las asignadas al perfil
+     * Carga las playlists disponibles y marca las asignadas al perfil usando GraphQL
      * @param {string} profileId - ID del perfil
      */
     async function loadPlaylists(profileId) {
@@ -233,21 +259,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Obtener todas las playlists
-            const response = await fetch('http://localhost:3000/api/admin/playlists', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener todas las playlists
+            const graphqlQuery = `
+                query GetAllPlaylists {
+                    playlists {
+                        _id
+                        name
+                        associatedProfiles
+                        adminId
+                        createdAt
+                        videoCount
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery
+                })
             });
             
-            if (!response.ok) {
-                throw new Error('Error al cargar las playlists');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener playlists');
             }
             
-            playlists = await response.json();
+            // Obtener todas las playlists de la respuesta
+            playlists = result.data.playlists;
             
-            // Obtener playlists asociadas al perfil (recorriendo las playlists y verificando si el perfil está en associatedProfiles)
+            // Obtener playlists asociadas al perfil
             const associatedPlaylists = playlists.filter(playlist => 
                 playlist.associatedProfiles && playlist.associatedProfiles.includes(profileId)
             );
@@ -273,7 +321,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('server_error');
             
             // Mostrar mensaje de error
@@ -360,8 +407,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'dashboard.html';
             }, 1500);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(editProfileForm, false);
             
@@ -408,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('No se ha iniciado sesión');
         }
         
-        const response = await fetch(`http://localhost:3000/api/admin/restricted_users?id=${profileId}`, {
+        const response = await fetch(`${API_URL}/admin/restricted_users?id=${profileId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -450,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Proceso para añadir el perfil a nuevas playlists
         for (const playlistId of playlistsToAdd) {
             // Obtener datos de la playlist
-            const getResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const getResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -470,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 : [profileId];
             
             // Actualizar la playlist con el nuevo perfil
-            const updateResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const updateResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -490,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Proceso para quitar el perfil de playlists existentes
         for (const playlistId of playlistsToRemove) {
             // Obtener datos de la playlist
-            const getResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const getResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -510,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 : [];
             
             // Actualizar la playlist sin el perfil
-            const updateResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const updateResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -548,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
             await updateProfilePlaylists(profileId, originalAssociatedPlaylists, []);
             
             // Eliminar el perfil
-            const response = await fetch(`http://localhost:3000/api/admin/restricted_users?id=${profileId}`, {
+            const response = await fetch(`${API_URL}/admin/restricted_users?id=${profileId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -572,8 +617,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'dashboard.html';
             }, 1500);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Restaurar estado del botón de eliminar
             confirmDeleteBtn.innerHTML = `Eliminar perfil`;
             confirmDeleteBtn.disabled = false;
@@ -599,7 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/session', {
+            const response = await fetch(`${API_URL}/session`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -619,8 +662,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '../shared/login.html';
             }, 1000);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Incluso si hay error, limpiamos el almacenamiento y redirigimos
             localStorage.removeItem('token');
             localStorage.removeItem('adminId');

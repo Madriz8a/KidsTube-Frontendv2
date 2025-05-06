@@ -1,3 +1,6 @@
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener('DOMContentLoaded', function() {
     const editVideoForm = document.getElementById('editVideoForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -142,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga los datos del video
+     * Carga los datos del video usando GraphQL
      * @param {string} videoId - ID del video a editar
      */
     async function loadVideoData(videoId) {
@@ -156,30 +159,79 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Obtener datos del video
-            const videoResponse = await fetch(`http://localhost:3000/api/admin/videos?id=${videoId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener datos del video
+            const graphqlQuery = `
+                query GetVideo($id: ID!) {
+                    video(id: $id) {
+                        _id
+                        name
+                        youtubeUrl
+                        description
+                        playlistId
+                        adminId
+                        createdAt
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery,
+                    variables: {
+                        id: videoId
+                    }
+                })
             });
             
-            if (!videoResponse.ok) {
-                throw new Error('Error al cargar los datos del video');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener datos del video');
             }
             
-            videoData = await videoResponse.json();
+            // Obtener el video de la respuesta
+            videoData = result.data.video;
             
-            // Obtener datos de la playlist
-            const playlistResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${videoData.playlistId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener datos de la playlist
+            const playlistQuery = `
+                query GetPlaylist($id: ID!) {
+                    playlist(id: $id) {
+                        _id
+                        name
+                        associatedProfiles
+                        adminId
+                        createdAt
+                        videoCount
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL para la playlist
+            const playlistResponse = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: playlistQuery,
+                    variables: {
+                        id: videoData.playlistId
+                    }
+                })
             });
             
-            if (playlistResponse.ok) {
-                playlistData = await playlistResponse.json();
+            const playlistResult = await playlistResponse.json();
+            
+            if (!playlistResult.errors) {
+                playlistData = playlistResult.data.playlist;
                 
                 // Mostrar nombre de la playlist en la insignia
                 if (playlistData && playlistData.name) {
@@ -200,7 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingIndicator.style.display = 'none';
             editVideoForm.style.display = 'block';
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('video_not_found');
             
             // Ocultar indicador de carga
@@ -314,8 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 1500);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(editVideoForm, false);
             
@@ -366,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('No se ha iniciado sesión');
         }
         
-        const response = await fetch(`http://localhost:3000/api/admin/videos?id=${videoId}`, {
+        const response = await fetch(`${API_URL}/admin/videos?id=${videoId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -403,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmDeleteBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...`;
             confirmDeleteBtn.disabled = true;
             
-            const response = await fetch(`http://localhost:3000/api/admin/videos?id=${videoId}`, {
+            const response = await fetch(`${API_URL}/admin/videos?id=${videoId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -431,8 +480,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 1500);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Restaurar estado del botón de eliminar
             confirmDeleteBtn.innerHTML = `Eliminar video`;
             confirmDeleteBtn.disabled = false;
@@ -458,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/session', {
+            const response = await fetch(`${API_URL}/session`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -478,8 +525,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '../shared/login.html';
             }, 1000);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Incluso si hay error, limpiamos el almacenamiento y redirigimos
             localStorage.removeItem('token');
             localStorage.removeItem('adminId');

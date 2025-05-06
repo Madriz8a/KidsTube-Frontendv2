@@ -1,3 +1,7 @@
+// Variables de entorno para las URLs de la API
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener('DOMContentLoaded', function() {
     const createPlaylistForm = document.getElementById('createPlaylistForm');
     const playlistNameInput = document.getElementById('playlistName');
@@ -62,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga los perfiles infantiles disponibles para asignar a la playlist
+     * Carga los perfiles infantiles disponibles para asignar a la playlist usando GraphQL
      */
     async function loadProfiles() {
         try {
@@ -75,18 +79,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/admin/restricted_users', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener perfiles
+            const graphqlQuery = `
+                query GetProfiles {
+                    profiles {
+                        _id
+                        full_name
+                        avatar
+                        AdminId
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery
+                })
             });
             
-            if (!response.ok) {
-                throw new Error('Error al cargar los perfiles');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener perfiles');
             }
             
-            profiles = await response.json();
+            // Obtener los perfiles de la respuesta
+            profiles = result.data.profiles;
             
             // Mostrar los perfiles en la interfaz
             if (profiles.length > 0) {
@@ -106,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('server_error', 'Error de carga');
             
             // Mostrar mensaje de error
@@ -187,8 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1500);
             }
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(createPlaylistForm, false);
             
@@ -225,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('No se ha iniciado sesión');
         }
         
-        const response = await fetch('http://localhost:3000/api/admin/playlists', {
+        const response = await fetch(`${API_URL}/admin/playlists`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -256,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/session', {
+            const response = await fetch(`${API_URL}/session`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -276,8 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '../shared/login.html';
             }, 1000);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Incluso si hay error, limpiamos el almacenamiento y redirigimos
             localStorage.removeItem('token');
             localStorage.removeItem('adminId');

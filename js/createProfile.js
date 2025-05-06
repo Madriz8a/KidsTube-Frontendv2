@@ -1,3 +1,7 @@
+// Variables de entorno para las URLs de la API
+const API_URL = 'http://localhost:3000/api';
+const GRAPHQL_URL = 'http://localhost:4000/graphql';
+
 document.addEventListener('DOMContentLoaded', function() {
     const createProfileForm = document.getElementById('createProfileForm');
     const fullNameInput = document.getElementById('fullName');
@@ -101,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Carga las playlists disponibles para asignar al perfil
+     * Carga las playlists disponibles para asignar al perfil usando GraphQL
      */
     async function loadPlaylists() {
         try {
@@ -114,18 +118,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/admin/playlists', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // Consulta GraphQL para obtener playlists
+            const graphqlQuery = `
+                query GetPlaylists {
+                    playlists {
+                        _id
+                        name
+                        associatedProfiles
+                        adminId
+                        createdAt
+                        videoCount
+                    }
                 }
+            `;
+            
+            // Realizar la consulta GraphQL
+            const response = await fetch(GRAPHQL_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    query: graphqlQuery
+                })
             });
             
-            if (!response.ok) {
-                throw new Error('Error al cargar las playlists');
+            const result = await response.json();
+            
+            // Verificar errores en la respuesta GraphQL
+            if (result.errors) {
+                throw new Error(result.errors[0].message || 'Error al obtener playlists');
             }
             
-            playlists = await response.json();
+            // Obtener las playlists de la respuesta
+            playlists = result.data.playlists;
             
             // Mostrar las playlists en la interfaz
             if (playlists.length > 0) {
@@ -136,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 playlistCheckboxes.innerHTML = '';
             }
         } catch (error) {
-            console.error('Error:', error);
             window.Notifications.showError('server_error', 'Error de carga');
         }
     }
@@ -211,8 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1500);
             }
         } catch (error) {
-            console.error('Error:', error);
-            
             // Desactivar estado de carga
             window.Notifications.toggleFormLoading(createProfileForm, false);
             
@@ -259,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('No se ha iniciado sesión');
         }
         
-        const response = await fetch('http://localhost:3000/api/admin/restricted_users', {
+        const response = await fetch(`${API_URL}/admin/restricted_users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -294,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Para cada playlist seleccionada
         for (const playlistId of playlistIds) {
             // Primero obtenemos los datos actuales de la playlist
-            const getResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const getResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -314,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 : [profileId];
             
             // Actualizar la playlist con el nuevo perfil
-            const updateResponse = await fetch(`http://localhost:3000/api/admin/playlists?id=${playlistId}`, {
+            const updateResponse = await fetch(`${API_URL}/admin/playlists?id=${playlistId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -343,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('http://localhost:3000/api/session', {
+            const response = await fetch(`${API_URL}/session`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -363,8 +387,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '../shared/login.html';
             }, 1000);
         } catch (error) {
-            console.error('Error:', error);
-            
             // Incluso si hay error, limpiamos el almacenamiento y redirigimos
             localStorage.removeItem('token');
             localStorage.removeItem('adminId');
